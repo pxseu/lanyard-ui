@@ -1,0 +1,3 @@
+{
+    "extends": "@pxseu/eslint-config/react"
+}
