@@ -90,11 +90,12 @@ const Spinner = styled.div`
 	}
 `;
 
-const Title = styled.h1`
+const Title = styled.h2`
 	font-size: 2rem;
 	margin-bottom: 1rem;
 	margin-top: 1rem;
 	font-weight: bold;
+	text-align: center;
 `;
 
 const Loader: FC = () => {

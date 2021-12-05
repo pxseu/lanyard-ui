@@ -6,7 +6,7 @@ import { AppContext } from "App";
 
 const KVWrapper = styled.div`
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
 	align-items: center;
 	justify-content: space-between;
 	width: 100%;
@@ -47,7 +47,7 @@ const KVInput = styled.input`
 	}
 `;
 
-const KVButton = styled.button<{ show?: boolean }>`
+const KVButton = styled.button<{ show?: boolean; hoverColors?: string }>`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -63,12 +63,30 @@ const KVButton = styled.button<{ show?: boolean }>`
 	background-color: ${({ theme }) => theme.colors.presance};
 	color: ${({ theme }) => theme.colors.primary};
 	border: none;
-	transition: width 1s ease-in-out;
+	transition: color 0.2s ease-in-out;
 
 	&:focus {
-		width: 40px;
 		display: "initial";
+		${({ hoverColors }) => hoverColors && `color: ${hoverColors};`}
+		outline: 2px solid ${({ theme }) => theme.colors.outline};
 	}
+
+	&:hover {
+		${({ hoverColors }) => hoverColors && `color: ${hoverColors};`}
+	}
+`;
+
+const Row = styled.div`
+	flex: 1;
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	justify-content: center;
+	align-items: center;
+`;
+
+const Title = styled.p`
+	color: #a53434;
 `;
 
 interface State {
@@ -80,6 +98,7 @@ interface State {
 	editing: boolean;
 	delete: boolean;
 	hover: boolean;
+	error: string | null;
 }
 
 type Action =
@@ -103,6 +122,10 @@ type Action =
 	  }
 	| {
 			type: "hover" | "hover_out";
+	  }
+	| {
+			type: "error";
+			payload: string;
 	  };
 
 const reducer = (state: State, action: Action): State => {
@@ -143,10 +166,31 @@ const reducer = (state: State, action: Action): State => {
 			};
 
 		case "request_done":
+			if (state.initialKey === "" && state.initialValue === "")
+				return {
+					...state,
+					sending: false,
+					delete: false,
+					error: null,
+					key: "",
+					value: "",
+				};
+
 			return {
 				...state,
 				sending: false,
 				delete: false,
+				error: null,
+			};
+
+		case "error":
+			return {
+				...state,
+				sending: false,
+				delete: false,
+				error: action.payload,
+				key: state.initialKey,
+				value: state.initialValue,
 			};
 
 		case "edit_reset":
@@ -157,12 +201,13 @@ const reducer = (state: State, action: Action): State => {
 				editing: false,
 			};
 
-		case "edit_done":
+		case "edit_done": {
 			return {
 				...state,
 				editing: false,
 				sending: true,
 			};
+		}
 
 		case "delete":
 			return {
@@ -181,6 +226,7 @@ const reducer = (state: State, action: Action): State => {
 			return {
 				...state,
 				hover: false,
+				error: null,
 			};
 
 		default:
@@ -198,24 +244,38 @@ const KVElement: FC<{ data: [string, string] }> = ({ data }) => {
 		editing: false,
 		delete: false,
 		hover: false,
+		error: null,
 	});
 
 	const { request } = useContext(AppContext);
+
+	const onKeyDown = (e: React.KeyboardEvent<HTMLElement>, cb?: () => void) => {
+		if (e.key === "Enter") {
+			cb?.();
+		}
+	};
 
 	useEffect(() => {
 		if (!state.sending) return;
 
 		let mounted = true;
 
-		if (state.delete && !!state.initialKey) {
-			request("DELETE", state.initialKey).then(() => mounted && dispatch({ type: "request_done" }));
+		if (state.delete && state.initialKey) {
+			request("DELETE", state.initialKey).then(
+				() => mounted && dispatch({ type: "request_done" }),
+				(e) => mounted && dispatch({ type: "error", payload: e.message }),
+			);
 		} else {
 			if (state.initialKey && state.key !== state.initialKey) {
 				Promise.all([request("PUT", state.key, state.value), request("DELETE", state.initialKey)]).then(
 					() => mounted && dispatch({ type: "request_done" }),
+					(e) => mounted && dispatch({ type: "error", payload: e.message }),
 				);
 			} else {
-				request("PUT", state.key, state.value).then(() => mounted && dispatch({ type: "request_done" }));
+				request("PUT", state.key, state.value).then(
+					() => mounted && dispatch({ type: "request_done" }),
+					(e) => mounted && dispatch({ type: "error", payload: e.message }),
+				);
 			}
 		}
 
@@ -224,45 +284,65 @@ const KVElement: FC<{ data: [string, string] }> = ({ data }) => {
 		};
 	}, [state.delete, state.sending]);
 
+	const editingDone = () => state.editing && dispatch({ type: "edit_done" });
+	const deleteValue = () => dispatch({ type: "delete" });
+	const reset = () => state.editing && dispatch({ type: "edit_reset" });
+
 	return (
 		<KVWrapper
 			onMouseEnter={() => dispatch({ type: "hover" })}
 			onMouseLeave={() => dispatch({ type: "hover_out" })}
 		>
-			<KVInputWrapper>
-				<KVInput
-					value={state.key}
-					onChange={(e) => dispatch({ type: "set_key", payload: e.target.value })}
-					placeholder="key"
-					required={state.editing}
-					disabled={state.sending}
-				/>
-			</KVInputWrapper>
+			<Row>
+				<KVInputWrapper>
+					<KVInput
+						value={state.key}
+						onChange={(e) => dispatch({ type: "set_key", payload: e.target.value })}
+						placeholder="key"
+						required={state.editing}
+						disabled={state.sending}
+						onKeyDown={(e) => onKeyDown(e, editingDone)}
+					/>
+				</KVInputWrapper>
 
-			<KVInputWrapper>
-				<KVInput
-					value={state.value}
-					onChange={(e) => dispatch({ type: "set_value", payload: e.target.value })}
-					placeholder="value"
-					required={state.editing}
-					disabled={state.sending}
-				/>
-			</KVInputWrapper>
+				<KVInputWrapper>
+					<KVInput
+						value={state.value}
+						onChange={(e) => dispatch({ type: "set_value", payload: e.target.value })}
+						placeholder="value"
+						required={state.editing}
+						disabled={state.sending}
+						onKeyDown={(e) => onKeyDown(e, editingDone)}
+					/>
+				</KVInputWrapper>
 
-			<KVButton onClick={() => dispatch({ type: "edit_reset" })} show={state.editing}>
-				<FaUndo />
-			</KVButton>
+				<KVButton onClick={reset} onKeyDown={(e) => onKeyDown(e, reset)} show={state.editing}>
+					<FaUndo />
+				</KVButton>
 
-			<KVButton onClick={() => dispatch({ type: "edit_done" })} show={state.editing}>
-				<FaRegCheckCircle />
-			</KVButton>
+				<KVButton
+					onClick={editingDone}
+					onKeyDown={(e) => onKeyDown(e, editingDone)}
+					show={state.editing}
+					hoverColors="#34a534"
+				>
+					<FaRegCheckCircle />
+				</KVButton>
 
-			<KVButton
-				onClick={() => dispatch({ type: "delete" })}
-				show={(state.editing || state.hover) && !!state.initialKey}
-			>
-				<FaTrash />
-			</KVButton>
+				<KVButton
+					onClick={deleteValue}
+					onKeyDown={(e) => onKeyDown(e, deleteValue)}
+					show={(state.editing || state.hover) && !!state.initialKey}
+					hoverColors="#a53434"
+				>
+					<FaTrash />
+				</KVButton>
+			</Row>
+			{state.error && (
+				<Row>
+					<Title>Error: {state.error}</Title>
+				</Row>
+			)}
 		</KVWrapper>
 	);
 };

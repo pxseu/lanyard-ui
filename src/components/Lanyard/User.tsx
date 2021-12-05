@@ -1,31 +1,13 @@
 import { AppContext } from "App";
+import { Wrapper } from "components/Common";
 import { useEffect } from "react";
 import { FC, useContext, useState } from "react";
 import styled from "styled-components";
-import KV from "./KV";
 
-const Postition = styled.div`
-	margin-top: 10px;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	width: 100%;
-	height: 100%;
-`;
-
-const Wrapper = styled.div`
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	width: 90%;
-	max-width: 600px;
-	background-color: ${({ theme }) => theme.colors.presance};
+const UserWrapper = styled(Wrapper)`
 	border-radius: 10px;
 	overflow: hidden;
-	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+	justify-content: center;
 `;
 
 const Avatar = styled.img`
@@ -36,8 +18,8 @@ const Avatar = styled.img`
 	z-index: 2;
 	pointer-events: none;
 	user-select: none;
-	padding: 3px;
-	background-color: ${({ theme }) => theme.colors.background};
+	padding: 5px;
+	background-color: ${({ theme }) => theme.colors.presance};
 `;
 
 const Banner = styled.img<{ show: boolean }>`
@@ -89,26 +71,23 @@ const User: FC = () => {
 	if (!state.presance) return null;
 
 	return (
-		<Postition>
-			<Wrapper>
-				<Info>
-					<Banner
-						show={!bannerFailed}
-						src={`https://dcdn.dstn.to/banners/${state.presance.discord_user.id}?size=4096`}
-						onError={() => setBannerFailed(true)}
-					/>
-					<Avatar
-						src={`https://cdn.discordapp.com/avatars/${state.presance.discord_user.id}/${state.presance.discord_user.avatar}.webp`}
-					/>
-					<Username>
-						{state.presance.discord_user.username}
-						<Discriminator>#{state.presance.discord_user.discriminator}</Discriminator>
-					</Username>
-					<Id>{state.presance.discord_user.id}</Id>
-				</Info>
-			</Wrapper>
-			<KV data={state.presance.kv} />
-		</Postition>
+		<UserWrapper>
+			<Info>
+				<Banner
+					show={!bannerFailed}
+					src={`https://dcdn.dstn.to/banners/${state.presance.discord_user.id}?size=4096`}
+					onError={() => setBannerFailed(true)}
+				/>
+				<Avatar
+					src={`https://cdn.discordapp.com/avatars/${state.presance.discord_user.id}/${state.presance.discord_user.avatar}.webp`}
+				/>
+				<Username>
+					{state.presance.discord_user.username}
+					<Discriminator>#{state.presance.discord_user.discriminator}</Discriminator>
+				</Username>
+				<Id>{state.presance.discord_user.id}</Id>
+			</Info>
+		</UserWrapper>
 	);
 };
 

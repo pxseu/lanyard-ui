@@ -1,34 +1,30 @@
-import { FC } from "react";
+import { AppContext } from "App";
+import { Wrapper } from "components/Common";
+import { FC, useContext } from "react";
 import styled from "styled-components";
 import KVElement from "./KVElement";
 
-const KVContainer = styled.div`
-	margin-top: 20px;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	width: 90%;
-	padding: 10px;
+const KVWrapper = styled(Wrapper)`
 	border-radius: 10px;
-	max-width: 600px;
-	height: 100%;
-	background-color: ${({ theme }) => theme.colors.presance};
-	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+	overflow: hidden;
 `;
 
-const KV: FC<{ data: Record<string, string> }> = ({ data }) => {
-	const dataArr = Object.entries(data);
+const KV: FC = () => {
+	const context = useContext(AppContext);
+
+	if (!context.presance) return null;
+
+	const dataArr = Object.entries(context.presance?.kv);
 
 	return (
-		<KVContainer>
+		<KVWrapper>
 			<h2>Lanyard KV</h2>
 			<KVElement data={["", ""]} />
 
 			{dataArr.map((elData) => (
 				<KVElement key={elData.join(":")} data={elData} />
 			))}
-		</KVContainer>
+		</KVWrapper>
 	);
 };
 

@@ -1,8 +1,52 @@
 /* eslint-disable @typescript-eslint/indent */
 import { AppContext } from "App";
-import Fade from "components/Fade";
 import { FC, useContext, useEffect, useReducer } from "react";
+import styled from "styled-components";
 import { KEY_ID, KEY_TOKEN } from "utils/consts";
+import { Wrapper } from "./Common";
+
+const InputTitle = styled.h2`
+	font-size: 1.5rem;
+	margin-bottom: 0.5rem;
+`;
+
+const DataInput = styled.input`
+	width: 90%;
+	max-width: 300px;
+	flex: 1;
+	border: none;
+	background-color: ${({ theme }) => theme.colors.background};
+	color: ${({ theme }) => theme.colors.primary};
+	font-size: 1rem;
+	padding: 10px;
+	border-radius: 5px;
+
+	&:focus {
+		outline: 2px solid ${({ theme }) => theme.colors.outline};
+	}
+
+	&:disabled {
+		color: ${({ theme }) => theme.colors.primary}aa;
+	}
+`;
+
+const Checkbox = styled.input`
+	margin-right: 0.5rem;
+	&:focus {
+		outline: 2px solid ${({ theme }) => theme.colors.outline};
+	}
+`;
+
+const InputGroup = styled.div`
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	/* background-color: ${({ theme }) => theme.colors.background}; */
+	margin: 2px 0;
+	padding: 10px;
+	border-radius: 5px;
+	width: 100%;
+`;
 
 interface State {
 	id: string;
@@ -70,7 +114,7 @@ const reducer = (state: State, action: Action): State => {
 
 const Landing: FC = () => {
 	const [state, dispatch] = useReducer(reducer, {
-		id: localStorage.getItem(KEY_ID) ?? "819287687121993768",
+		id: localStorage.getItem(KEY_ID) || "819287687121993768",
 		token: localStorage.getItem(KEY_TOKEN) ?? "",
 		store: !!localStorage.getItem(KEY_TOKEN),
 		show: false,
@@ -96,24 +140,36 @@ const Landing: FC = () => {
 	}, [state.id]);
 
 	return (
-		<Fade>
-			<h2>Input your Discord user Id bellow:</h2>
-			<input
-				type="text"
-				value={state.id}
-				onChange={(e) => dispatch({ type: "set_id", payload: e.target.value })}
-			/>
-			<h2>Input your Lanyard api token bellow:</h2>
-			<input
-				type={state.show ? "text" : "password"}
-				value={state.token}
-				onChange={(e) => dispatch({ type: "set_token", payload: e.target.value })}
-			/>
-			<span>
-				Keep token stored:{" "}
-				<input type="checkbox" checked={state.store} onChange={() => dispatch({ type: "toggle_store" })} />
-			</span>
-		</Fade>
+		<Wrapper>
+			<InputGroup>
+				<InputTitle>Discord Id:</InputTitle>
+				<DataInput
+					type="text"
+					value={state.id}
+					onChange={(e) => dispatch({ type: "set_id", payload: e.target.value })}
+				/>
+			</InputGroup>
+			<InputGroup>
+				<InputTitle>Lanyard api token:</InputTitle>
+				<DataInput
+					type={"text"}
+					value={state.show ? state.token : "*".repeat(state.token.length)}
+					onChange={(e) => dispatch({ type: "set_token", payload: e.target.value })}
+				/>
+				<span>
+					Show token:{" "}
+					<Checkbox type="checkbox" checked={state.show} onChange={() => dispatch({ type: "toggle_show" })} />
+				</span>
+				<span>
+					Keep token stored:{" "}
+					<Checkbox
+						type="checkbox"
+						checked={state.store}
+						onChange={() => dispatch({ type: "toggle_store" })}
+					/>
+				</span>
+			</InputGroup>
+		</Wrapper>
 	);
 };
 export default Landing;

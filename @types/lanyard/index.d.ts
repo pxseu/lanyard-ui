@@ -59,6 +59,7 @@ declare module "lanyard" {
 		created_at: number;
 		assets: Assets;
 		application_id: string;
+		sync_id?: string;
 	}
 
 	export interface Timestamps {
