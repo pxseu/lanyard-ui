@@ -1,4 +1,3 @@
-import "react-tippy/dist/tippy.css";
 import Loader from "components/Loader";
 import { useLanyard } from "hooks/useLanyard";
 import Inputs from "components/Data";
