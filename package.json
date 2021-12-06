@@ -51,8 +51,8 @@
 	"devDependencies": {
 		"@pxseu/eslint-config": "1.0.1",
 		"@pxseu/prettier-config": "^1.0.0",
-		"@typescript-eslint/eslint-plugin": "^3",
-		"@typescript-eslint/parser": "^3",
+		"@typescript-eslint/eslint-plugin": "^5",
+		"@typescript-eslint/parser": "^5",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-import": "^2.25.3",
 		"prettier": "^2.5.0"

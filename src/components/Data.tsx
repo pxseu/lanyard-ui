@@ -99,7 +99,8 @@ const reducer = (state: State, action: Action): State => {
 		case "toggle_store": {
 			const value = !state.store;
 
-			if (!value) localStorage.removeItem(KEY_TOKEN);
+			if (value) localStorage.setItem(KEY_TOKEN, state.token);
+			else localStorage.removeItem(KEY_TOKEN);
 
 			return {
 				...state,
@@ -144,6 +145,8 @@ const Landing: FC = () => {
 			<InputGroup>
 				<InputTitle>Discord Id:</InputTitle>
 				<DataInput
+					name="id"
+					autoComplete="id"
 					type="text"
 					value={state.id}
 					onChange={(e) => dispatch({ type: "set_id", payload: e.target.value })}
@@ -152,8 +155,10 @@ const Landing: FC = () => {
 			<InputGroup>
 				<InputTitle>Lanyard api token:</InputTitle>
 				<DataInput
-					type={"text"}
-					value={state.show ? state.token : "*".repeat(state.token.length)}
+					name="token"
+					type={state.show ? "text" : "password"}
+					autoComplete="token"
+					value={state.token}
 					onChange={(e) => dispatch({ type: "set_token", payload: e.target.value })}
 				/>
 				<span>

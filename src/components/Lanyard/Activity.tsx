@@ -2,7 +2,12 @@ import { AppContext } from "App";
 import { Wrapper } from "components/Common";
 import { FC, useContext } from "react";
 import styled from "styled-components";
-import { PLACEHOLDER } from "utils/consts";
+import { stringFromType } from "utils/activity";
+import { resolveAsset } from "utils/asset";
+import { resolveEmoji } from "utils/emoji";
+import { logger } from "utils/log";
+
+const log = (...args: any[]) => logger("Activity", ...args);
 
 const ActivityWrapper = styled(Wrapper)`
 	flex-direction: row;
@@ -19,19 +24,20 @@ const Collumn = styled.div<{ flex?: boolean }>`
 
 const AssetWrapper = styled.div`
 	position: relative;
-	width: 120px;
-	height: 120px;
+	width: 100px;
+	height: 100px;
 	margin: 5px;
 	margin-right: 15px;
 `;
 
-const Asset = styled.img`
+const Asset = styled.img<{ emoji?: boolean }>`
 	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	border-radius: 10px;
+	top: ${({ emoji }) => (emoji ? "5%" : 0)};
+	left: ${({ emoji }) => (emoji ? "5%" : 0)};
+	width: ${({ emoji }) => (emoji ? "90%" : "100%")};
+	height: ${({ emoji }) => (emoji ? "90%" : "100%")};
+	${({ emoji }) => !emoji && "border-radius: 10px;"}
+	${({ emoji }) => emoji && "object-fit: contain;"}
 	pointer-events: none;
 	user-select: none;
 `;
@@ -72,31 +78,6 @@ const Anchor = styled.a`
 	cursor: pointer;
 `;
 
-const resolveAsset = (asset?: string, applicationId?: string) => {
-	const split = asset?.split(":");
-
-	if (split?.length && split[0] === "spotify") return `https://i.scdn.co/image/${split[1]}`;
-
-	if (!asset || !applicationId) return PLACEHOLDER;
-
-	return `https://cdn.discordapp.com/app-assets/${applicationId}/${asset}.webp`;
-};
-
-const StringFromType = (type: number) => {
-	switch (type) {
-		case 0:
-			return "Playing";
-		case 1:
-			return "Streaming";
-		case 2:
-			return "Listening to";
-		case 3:
-			return "Watching";
-		default:
-			return "";
-	}
-};
-
 /*
     {activity?.name}
     {"\n"}
@@ -111,32 +92,39 @@ const Activity: FC = () => {
 
 	if (!state.presance) return null;
 
-	const activity = state.presance?.activities[0];
+	const ordered = state.presance?.activities.sort((a, b) => a.type - b.type);
 
-	if (!activity) return null;
+	log(ordered);
 
-	console.log(state.presance);
+	const activity = ordered[0] ?? {
+		name: "Not doing anything",
+	};
+
+	// if (!activity) return null;
+
+	const isEmoji = activity.type === 4 && !!activity.emoji;
 
 	return (
 		<ActivityWrapper>
 			<Collumn>
-				<AssetWrapper>
+				<AssetWrapper title={activity.type === 4 && !!activity.emoji ? activity.emoji.name : activity.name}>
 					<Asset
-						src={resolveAsset(activity?.assets?.large_image, activity?.application_id)}
-						onError={() => resolveAsset()}
+						emoji={isEmoji}
+						src={
+							activity.type === 4 && !!activity.emoji
+								? resolveEmoji(activity.emoji)
+								: resolveAsset(activity?.assets?.large_image, activity?.application_id)
+						}
 					/>
 
 					{activity.assets?.small_image && (
-						<AssetSmaller
-							src={resolveAsset(activity.assets.small_image, activity.application_id)}
-							onError={() => resolveAsset()}
-						/>
+						<AssetSmaller src={resolveAsset(activity.assets.small_image, activity.application_id)} />
 					)}
 				</AssetWrapper>
 			</Collumn>
 			<Collumn flex>
 				<ActivityName>
-					{StringFromType(activity.type)} {activity.name}
+					{stringFromType(activity.type)} {activity.name}
 				</ActivityName>
 				<ActivityDetails>
 					{activity.type === 2 && activity.sync_id ? (

@@ -3,6 +3,8 @@ import { Wrapper } from "components/Common";
 import { useEffect } from "react";
 import { FC, useContext, useState } from "react";
 import styled from "styled-components";
+import { colorFromStatus } from "utils/status";
+import { resolveAvatar } from "../../utils/avatar";
 
 const UserWrapper = styled(Wrapper)`
 	border-radius: 10px;
@@ -10,11 +12,15 @@ const UserWrapper = styled(Wrapper)`
 	justify-content: center;
 `;
 
-const Avatar = styled.img`
+const AvatarWrapper = styled.div`
+	position: relative;
 	width: 120px;
 	height: 120px;
+	margin-bottom: 20px;
+`;
+
+const Avatar = styled.img`
 	border-radius: 50%;
-	margin-bottom: 10px;
 	z-index: 2;
 	pointer-events: none;
 	user-select: none;
@@ -58,6 +64,17 @@ const Id = styled(Username)`
 	color: ${({ theme }) => theme.colors.primary}aa;
 `;
 
+const Status = styled.div<{ color: string }>`
+	position: absolute;
+	bottom: -8px;
+	right: -8px;
+	width: 25px;
+	height: 25px;
+	border-radius: 50%;
+	background-color: ${({ color }) => color};
+	border: 5px solid ${({ theme }) => theme.colors.presance};
+`;
+
 const User: FC = () => {
 	const state = useContext(AppContext);
 	const [bannerFailed, setBannerFailed] = useState(false);
@@ -78,9 +95,10 @@ const User: FC = () => {
 					src={`https://dcdn.dstn.to/banners/${state.presance.discord_user.id}?size=4096`}
 					onError={() => setBannerFailed(true)}
 				/>
-				<Avatar
-					src={`https://cdn.discordapp.com/avatars/${state.presance.discord_user.id}/${state.presance.discord_user.avatar}.webp`}
-				/>
+				<AvatarWrapper title={state.presance.discord_status}>
+					<Avatar src={resolveAvatar(state.presance.discord_user)} />
+					<Status color={colorFromStatus(state.presance.discord_status)} />
+				</AvatarWrapper>
 				<Username>
 					{state.presance.discord_user.username}
 					<Discriminator>#{state.presance.discord_user.discriminator}</Discriminator>

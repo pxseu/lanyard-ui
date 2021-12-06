@@ -46,7 +46,7 @@ declare module "lanyard" {
 		public_flags: number;
 		id: string;
 		discriminator: string;
-		avatar: string;
+		avatar: string | null;
 	}
 
 	export interface Activity {
@@ -60,6 +60,7 @@ declare module "lanyard" {
 		assets: Assets;
 		application_id: string;
 		sync_id?: string;
+		emoji?: Emoji;
 	}
 
 	export interface Timestamps {
@@ -71,5 +72,11 @@ declare module "lanyard" {
 		small_image: string;
 		large_text: string;
 		large_image: string;
+	}
+
+	export interface Emoji {
+		name: string;
+		id?: string;
+		animated?: boolean;
 	}
 }
