@@ -2,7 +2,7 @@
 import { useEffect, useReducer, useRef } from "react";
 import type { Presance, SocketMessageRecieve, SocketMessageSend } from "lanyard";
 import { logger } from "utils/log";
-import { KEY_ID, PRESANCE_KEY } from "utils/consts";
+import { KEY_ID, PRESANCE_KEY, USER_REGEX } from "utils/consts";
 
 enum Events {
 	presance = "presance",
@@ -48,8 +48,6 @@ type Action =
 			payload: string;
 	  };
 
-const USER_REGEX = /^\d{17,}$/;
-
 const socketLog = (...args: any[]) => logger("Socket", ...args);
 const lanyardLog = (...args: any[]) => logger("Lanyard", ...args);
 
@@ -73,6 +71,9 @@ const reducer = (state: State, action: Action): State => {
 			};
 		}
 		case Events.presance: {
+			// FIXME: Unsubsribe ability?
+			if (state.subscibed && state.subscibed !== action.payload.discord_user.id) return state;
+
 			socketLog("Presance recieved", action.payload);
 			localStorage.setItem(PRESANCE_KEY, JSON.stringify(action.payload));
 
@@ -229,36 +230,42 @@ export const useLanyard = () => {
 		dispatch({ type: Events.reconnect });
 	};
 
+	const heartbeatSend = () => {
+		socketLog("Heartbeat");
+
+		send(
+			{
+				op: 3,
+			},
+			true,
+		);
+	};
+
 	const handleMessage = (event: MessageEvent) => {
 		const data: SocketMessageRecieve = JSON.parse(event.data);
 
 		switch (data.op) {
 			case 0: {
-				if (data.t === "INIT_STATE") {
+				if (data.t === "INIT_STATE")
 					return dispatch({
 						type: Events.presance,
 						payload: data.d,
 					});
-				}
 
-				if (data.t === "PRESENCE_UPDATE") {
-					// @ts-ignore
-					delete data.d.user_id;
-
+				if (data.t === "PRESENCE_UPDATE")
 					return dispatch({
 						type: Events.presance,
 						payload: data.d,
 					});
-				}
 
 				break;
 			}
 
 			case 1: {
-				heartbeat.current = setInterval(() => {
-					// we assume that the socket is still open
-					send({ op: 3 }, true);
-				}, data.d.heartbeat_interval);
+				// send an initial heartbeat
+				heartbeatSend();
+
+				heartbeat.current = setInterval(heartbeatSend, data.d.heartbeat_interval);
 				break;
 			}
 

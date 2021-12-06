@@ -56,6 +56,9 @@ const Username = styled.div`
 	font-size: 2em;
 	margin-bottom: 5px;
 	z-index: 2;
+	background-color: ${({ theme }) => theme.colors.presance}50;
+	padding: 2px 5px;
+	border-radius: 5px;
 `;
 
 const Discriminator = styled.span`

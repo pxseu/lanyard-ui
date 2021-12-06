@@ -17,7 +17,7 @@ declare module "lanyard" {
 				op: 0;
 				seq: 2;
 				t: "PRESENCE_UPDATE";
-				d: Presance & { user_id: string };
+				d: Presance;
 		  };
 
 	export type SocketMessageSend =

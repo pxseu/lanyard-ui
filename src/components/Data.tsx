@@ -3,6 +3,7 @@ import { AppContext } from "App";
 import { FC, useContext, useEffect, useReducer } from "react";
 import styled from "styled-components";
 import { KEY_ID, KEY_TOKEN } from "utils/consts";
+import { getId } from "utils/getId";
 import { Wrapper } from "./Common";
 
 const InputTitle = styled.h2`
@@ -76,6 +77,9 @@ const reducer = (state: State, action: Action): State => {
 		case "set_id": {
 			localStorage.setItem(KEY_ID, action.payload);
 
+			// not sure if this is the best way to do this
+			// if ("history" in window) history.pushState(null, "", `/${action.payload}`);
+
 			return {
 				...state,
 				id: action.payload,
@@ -90,6 +94,7 @@ const reducer = (state: State, action: Action): State => {
 				token: action.payload,
 			};
 		}
+
 		case "toggle_show":
 			return {
 				...state,
@@ -115,7 +120,7 @@ const reducer = (state: State, action: Action): State => {
 
 const Landing: FC = () => {
 	const [state, dispatch] = useReducer(reducer, {
-		id: localStorage.getItem(KEY_ID) || "819287687121993768",
+		id: getId(),
 		token: localStorage.getItem(KEY_TOKEN) ?? "",
 		store: !!localStorage.getItem(KEY_TOKEN),
 		show: false,
