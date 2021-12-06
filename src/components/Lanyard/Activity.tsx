@@ -24,8 +24,8 @@ const Collumn = styled.div<{ flex?: boolean }>`
 
 const AssetWrapper = styled.div`
 	position: relative;
-	width: 100px;
-	height: 100px;
+	width: 110px;
+	height: 110px;
 	margin: 5px;
 	margin-right: 15px;
 `;

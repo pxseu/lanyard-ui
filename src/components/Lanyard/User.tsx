@@ -14,18 +14,21 @@ const UserWrapper = styled(Wrapper)`
 
 const AvatarWrapper = styled.div`
 	position: relative;
-	width: 120px;
-	height: 120px;
-	margin-bottom: 20px;
+	width: 160px;
+	height: 160px;
+	margin-bottom: 10px;
 `;
 
 const Avatar = styled.img`
+	width: 100%;
+	height: 100%;
 	border-radius: 50%;
 	z-index: 2;
 	pointer-events: none;
 	user-select: none;
 	padding: 5px;
 	background-color: ${({ theme }) => theme.colors.presance};
+	object-fit: cover;
 `;
 
 const Banner = styled.img<{ show: boolean }>`
@@ -66,8 +69,8 @@ const Id = styled(Username)`
 
 const Status = styled.div<{ color: string }>`
 	position: absolute;
-	bottom: -8px;
-	right: -8px;
+	bottom: 10px;
+	right: 16px;
 	width: 25px;
 	height: 25px;
 	border-radius: 50%;
@@ -92,7 +95,7 @@ const User: FC = () => {
 			<Info>
 				<Banner
 					show={!bannerFailed}
-					src={`https://dcdn.dstn.to/banners/${state.presance.discord_user.id}?size=4096`}
+					src={`https://dcdn.dstn.to/banners/${state.presance.discord_user.id}?size=2048`}
 					onError={() => setBannerFailed(true)}
 				/>
 				<AvatarWrapper title={state.presance.discord_status}>
