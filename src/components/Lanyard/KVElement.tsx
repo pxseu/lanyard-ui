@@ -3,6 +3,7 @@ import { FC, useContext, useEffect, useReducer } from "react";
 import styled from "styled-components";
 import { FaRegCheckCircle, FaTrash, FaUndo } from "react-icons/fa";
 import { AppContext } from "App";
+import { ErrorText, Input } from "components/Common";
 
 const KVWrapper = styled.div`
 	display: flex;
@@ -26,25 +27,6 @@ const KVInputWrapper = styled.span`
 	margin-left: 4px;
 	margin-right: 4px;
 	transition: width 0.3s ease-in-out;
-`;
-
-const KVInput = styled.input`
-	width: 100%;
-	flex: 1;
-	border: none;
-	background-color: ${({ theme }) => theme.colors.presance};
-	color: ${({ theme }) => theme.colors.primary};
-	font-size: 1rem;
-	padding: 10px;
-	border-radius: 5px;
-
-	&:focus {
-		outline: 2px solid ${({ theme }) => theme.colors.outline};
-	}
-
-	&:disabled {
-		color: ${({ theme }) => theme.colors.primary}aa;
-	}
 `;
 
 const KVButton = styled.button<{ show?: boolean; hoverColors?: string }>`
@@ -83,10 +65,6 @@ const Row = styled.div`
 	width: 100%;
 	justify-content: center;
 	align-items: center;
-`;
-
-const Title = styled.p`
-	color: #a53434;
 `;
 
 interface State {
@@ -295,7 +273,7 @@ const KVElement: FC<{ data: [string, string] }> = ({ data }) => {
 		>
 			<Row>
 				<KVInputWrapper>
-					<KVInput
+					<Input
 						value={state.key}
 						onChange={(e) => dispatch({ type: "set_key", payload: e.target.value })}
 						placeholder="key"
@@ -306,7 +284,7 @@ const KVElement: FC<{ data: [string, string] }> = ({ data }) => {
 				</KVInputWrapper>
 
 				<KVInputWrapper>
-					<KVInput
+					<Input
 						value={state.value}
 						onChange={(e) => dispatch({ type: "set_value", payload: e.target.value })}
 						placeholder="value"
@@ -340,7 +318,7 @@ const KVElement: FC<{ data: [string, string] }> = ({ data }) => {
 			</Row>
 			{state.error && (
 				<Row>
-					<Title>Error: {state.error}</Title>
+					<ErrorText>Error: {state.error}</ErrorText>
 				</Row>
 			)}
 		</KVWrapper>

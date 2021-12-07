@@ -9,6 +9,7 @@ declare module "styled-components" {
 			background: "#202020";
 			presance: "#2a2a2a";
 			outline: "#acc0ff";
+			error: "#af0000";
 		};
 	}
 }

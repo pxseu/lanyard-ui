@@ -13,6 +13,7 @@
 		"@types/react-helmet": "^6.1.4",
 		"@types/styled-components": "^5.1.16",
 		"eslint-plugin-react": "^7.27.1",
+		"pako": "^2.0.4",
 		"react": "^17.0.2",
 		"react-dom": "^17.0.2",
 		"react-helmet": "^6.1.0",
@@ -24,7 +25,7 @@
 	},
 	"scripts": {
 		"start": "react-scripts start",
-		"build": "react-scripts build",
+		"build": "REACT_APP_ENV=production GENERATE_SOURCEMAP=false react-scripts build",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject",
 		"lint": "eslint --ext .js,.ts,.tsx src/ --fix",
@@ -51,6 +52,7 @@
 	"devDependencies": {
 		"@pxseu/eslint-config": "1.0.1",
 		"@pxseu/prettier-config": "^1.0.0",
+		"@types/pako": "^1.0.2",
 		"@typescript-eslint/eslint-plugin": "^5",
 		"@typescript-eslint/parser": "^5",
 		"eslint-config-prettier": "^8.3.0",

@@ -7,7 +7,7 @@ import { resolveAsset } from "utils/asset";
 import { resolveEmoji } from "utils/emoji";
 import { logger } from "utils/log";
 
-const log = (...args: any[]) => logger("Activity", ...args);
+const log = logger("Activity");
 
 const ActivityWrapper = styled(Wrapper)`
 	flex-direction: row;

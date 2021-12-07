@@ -2,7 +2,8 @@
 import { useEffect, useReducer, useRef } from "react";
 import type { Presance, SocketMessageRecieve, SocketMessageSend } from "lanyard";
 import { logger } from "utils/log";
-import { KEY_ID, PRESANCE_KEY, USER_REGEX } from "utils/consts";
+import { KEY_ID, PRESANCE_KEY, SOCKET_URL, USER_REGEX } from "utils/consts";
+import { parse, stringify } from "utils/parse";
 
 enum Events {
 	presance = "presance",
@@ -48,8 +49,8 @@ type Action =
 			payload: string;
 	  };
 
-const socketLog = (...args: any[]) => logger("Socket", ...args);
-const lanyardLog = (...args: any[]) => logger("Lanyard", ...args);
+const socketLog = logger("Socket");
+const lanyardLog = logger("Lanyard");
 
 const reducer = (state: State, action: Action): State => {
 	switch (action.type) {
@@ -148,7 +149,9 @@ export const useLanyard = () => {
 
 		socketLog("Sending", data);
 
-		socket.current!.send(JSON.stringify(data));
+		const message = stringify(data);
+
+		socket.current!.send(message);
 	};
 
 	const subscribe = async (user: string) => {
@@ -242,7 +245,7 @@ export const useLanyard = () => {
 	};
 
 	const handleMessage = (event: MessageEvent) => {
-		const data: SocketMessageRecieve = JSON.parse(event.data);
+		const data = parse<SocketMessageRecieve>(event.data);
 
 		switch (data.op) {
 			case 0: {
@@ -262,9 +265,6 @@ export const useLanyard = () => {
 			}
 
 			case 1: {
-				// send an initial heartbeat
-				heartbeatSend();
-
 				heartbeat.current = setInterval(heartbeatSend, data.d.heartbeat_interval);
 				break;
 			}
@@ -278,7 +278,8 @@ export const useLanyard = () => {
 	const connect = () => {
 		if (socket.current) return;
 
-		socket.current = new WebSocket("wss://lanyard.rest/socket");
+		socket.current = new WebSocket(SOCKET_URL);
+		socket.current.binaryType = "arraybuffer";
 		socket.current.addEventListener("open", handleOpen);
 		socket.current.addEventListener("close", handleClose);
 		socket.current.addEventListener("message", handleMessage);

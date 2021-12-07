@@ -4,35 +4,31 @@ import { FC, useContext, useEffect, useReducer } from "react";
 import styled from "styled-components";
 import { KEY_ID, KEY_TOKEN } from "utils/consts";
 import { getId } from "utils/getId";
-import { Wrapper } from "./Common";
+import { ErrorText, Input, Wrapper } from "./Common";
 
 const InputTitle = styled.h2`
 	font-size: 1.5rem;
 	margin-bottom: 0.5rem;
 `;
 
-const DataInput = styled.input`
-	width: 90%;
+const DataInput = styled(Input)`
 	max-width: 300px;
-	flex: 1;
-	border: none;
 	background-color: ${({ theme }) => theme.colors.background};
-	color: ${({ theme }) => theme.colors.primary};
-	font-size: 1rem;
-	padding: 10px;
-	border-radius: 5px;
+`;
 
-	&:focus {
-		outline: 2px solid ${({ theme }) => theme.colors.outline};
-	}
-
-	&:disabled {
-		color: ${({ theme }) => theme.colors.primary}aa;
-	}
+const CheckboxSpan = styled.span`
+	margin-top: 0.2rem;
+	font-size: 1.1rem;
 `;
 
 const Checkbox = styled.input`
-	margin-right: 0.5rem;
+	margin-left: 0.3rem;
+	width: 1.2rem;
+	height: 1.2rem;
+	vertical-align: middle;
+	border-radius: 5px;
+	padding: 5px;
+
 	&:focus {
 		outline: 2px solid ${({ theme }) => theme.colors.outline};
 	}
@@ -42,9 +38,8 @@ const InputGroup = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	/* background-color: ${({ theme }) => theme.colors.background}; */
 	margin: 2px 0;
-	padding: 10px;
+	padding: 5px;
 	border-radius: 5px;
 	width: 100%;
 `;
@@ -54,22 +49,20 @@ interface State {
 	token: string;
 	store: boolean;
 	show: boolean;
+	error: null | { field: string; message: string };
 }
 
 type Action =
 	| {
-			type: "set_id";
+			type: "set_id" | "set_token";
 			payload: string;
 	  }
 	| {
-			type: "set_token";
-			payload: string;
+			type: "toggle_store" | "toggle_show" | "clear_error";
 	  }
 	| {
-			type: "toggle_store";
-	  }
-	| {
-			type: "toggle_show";
+			type: "set_error";
+			payload: { field: "id" | "token"; message: string };
 	  };
 
 const reducer = (state: State, action: Action): State => {
@@ -113,6 +106,18 @@ const reducer = (state: State, action: Action): State => {
 			};
 		}
 
+		case "set_error":
+			return {
+				...state,
+				error: action.payload,
+			};
+
+		case "clear_error":
+			return {
+				...state,
+				error: null,
+			};
+
 		default:
 			return state;
 	}
@@ -124,6 +129,7 @@ const Landing: FC = () => {
 		token: localStorage.getItem(KEY_TOKEN) ?? "",
 		store: !!localStorage.getItem(KEY_TOKEN),
 		show: false,
+		error: null,
 	});
 
 	const context = useContext(AppContext);
@@ -133,14 +139,21 @@ const Landing: FC = () => {
 	}, [state.token]);
 
 	useEffect(() => {
+		dispatch({ type: "clear_error" });
+		if (!state.id) return;
+
+		let mounted = true;
+
 		const timeout = setTimeout(() => {
 			context.subscribe(state.id).then(
 				() => {},
-				() => {},
+				(reason) =>
+					mounted && dispatch({ type: "set_error", payload: { field: "id", message: reason.message } }),
 			);
 		}, 200);
 
 		return () => {
+			mounted = false;
 			clearTimeout(timeout);
 		};
 	}, [state.id]);
@@ -156,6 +169,7 @@ const Landing: FC = () => {
 					value={state.id}
 					onChange={(e) => dispatch({ type: "set_id", payload: e.target.value })}
 				/>
+				{state.error && state.error.field === "id" && <ErrorText>Error: {state.error.message}</ErrorText>}
 			</InputGroup>
 			<InputGroup>
 				<InputTitle>Lanyard api token:</InputTitle>
@@ -166,18 +180,25 @@ const Landing: FC = () => {
 					value={state.token}
 					onChange={(e) => dispatch({ type: "set_token", payload: e.target.value })}
 				/>
-				<span>
-					Show token:{" "}
-					<Checkbox type="checkbox" checked={state.show} onChange={() => dispatch({ type: "toggle_show" })} />
-				</span>
-				<span>
-					Keep token stored:{" "}
+				{state.error && state.error.field === "token" && <ErrorText>Error: {state.error.message}</ErrorText>}
+				<CheckboxSpan>
+					<label htmlFor="show-token">Show token:</label>
 					<Checkbox
+						name="show-token"
+						type="checkbox"
+						checked={state.show}
+						onChange={() => dispatch({ type: "toggle_show" })}
+					/>
+				</CheckboxSpan>
+				<CheckboxSpan>
+					<label htmlFor="store-token">Keep token stored:</label>
+					<Checkbox
+						name="store-token"
 						type="checkbox"
 						checked={state.store}
 						onChange={() => dispatch({ type: "toggle_store" })}
 					/>
-				</span>
+				</CheckboxSpan>
 			</InputGroup>
 		</Wrapper>
 	);
