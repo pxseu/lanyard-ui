@@ -1,4 +1,5 @@
-import styled from "styled-components";
+import { FC } from "react";
+import styled, { DefaultTheme, StyledComponentProps } from "styled-components";
 
 export const Wrapper = styled.div`
 	position: relative;
@@ -21,7 +22,7 @@ export const ErrorText = styled.span`
 	font-size: 1.2rem;
 `;
 
-export const Input = styled.input`
+const InputBase = styled.input`
 	width: 100%;
 	flex: 1;
 	border: none;
@@ -40,3 +41,16 @@ export const Input = styled.input`
 		color: ${({ theme }) => theme.colors.primary}aa;
 	}
 `;
+
+export const Input: FC<StyledComponentProps<"input", DefaultTheme, { noSelect?: boolean }, never>> = ({
+	noSelect,
+	...props
+}) => (
+	<InputBase
+		{...props}
+		onFocus={(e) => {
+			if (!noSelect) e.target.select();
+			props?.onFocus?.(e);
+		}}
+	/>
+);
