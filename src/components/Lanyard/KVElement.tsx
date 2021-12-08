@@ -107,10 +107,21 @@ type Action =
 			payload: string;
 	  };
 
+const isInitialToState = (state: State, action: Action): boolean => {
+	switch (action.type) {
+		case "set_key":
+			return state.initialKey === action.payload && state.initialValue === state.value;
+		case "set_value":
+			return state.initialValue === action.payload && state.initialKey === state.key;
+		default:
+			return false;
+	}
+};
+
 const reducer = (state: State, action: Action): State => {
 	switch (action.type) {
 		case "set_key":
-			if (action.payload !== state.key)
+			if (!isInitialToState(state, action))
 				return {
 					...state,
 					key: action.payload,
@@ -120,10 +131,11 @@ const reducer = (state: State, action: Action): State => {
 			return {
 				...state,
 				key: action.payload,
+				editing: false,
 			};
 
 		case "set_value":
-			if (action.payload !== state.value)
+			if (!isInitialToState(state, action))
 				return {
 					...state,
 					value: action.payload,
@@ -133,6 +145,7 @@ const reducer = (state: State, action: Action): State => {
 			return {
 				...state,
 				value: action.payload,
+				editing: false,
 			};
 
 		case "initialize":
