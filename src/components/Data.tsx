@@ -28,6 +28,7 @@ const Checkbox = styled.input`
 	vertical-align: middle;
 	border-radius: 5px;
 	padding: 5px;
+	transition: outline 0.05s ease-in-out;
 
 	&:focus {
 		outline: 2px solid ${({ theme }) => theme.colors.outline};

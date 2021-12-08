@@ -30,6 +30,7 @@ export const Input = styled.input`
 	font-size: 1rem;
 	padding: 10px;
 	border-radius: 5px;
+	transition: outline 0.05s ease-in-out;
 
 	&:focus {
 		outline: 2px solid ${({ theme }) => theme.colors.outline};

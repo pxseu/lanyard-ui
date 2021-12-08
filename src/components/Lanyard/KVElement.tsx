@@ -46,7 +46,7 @@ const KVButton = styled.button<{ show?: boolean; hoverColors?: string }>`
 	background-color: ${({ theme }) => theme.colors.presance};
 	color: ${({ theme }) => theme.colors.primary};
 	border: none;
-	transition: color 0.2s ease-in-out;
+	transition: color 0.1s ease-in-out, outline 0.05s ease-in-out;
 
 	&:focus {
 		display: "initial";
