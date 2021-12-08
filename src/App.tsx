@@ -8,6 +8,7 @@ import Activity from "components/Lanyard/Activity";
 import KV from "components/Lanyard/KV";
 import { logger } from "utils/log";
 import { PRODUCTION } from "utils/consts";
+import { Helmet } from "react-helmet";
 
 export const AppContext = createContext<ReturnType<typeof useLanyard>>({
 	presance: null,
@@ -15,6 +16,7 @@ export const AppContext = createContext<ReturnType<typeof useLanyard>>({
 	subscribe: async () => {},
 	setToken: () => {},
 	request: async () => {},
+	subscribed: null,
 });
 
 const Postition = styled.div`
@@ -41,6 +43,16 @@ const App = () => {
 
 	return (
 		<AppContext.Provider value={lanyard}>
+			<Helmet>
+				{lanyard.presance ? (
+					<title>
+						Checking User: {lanyard.presance.discord_user.username}#
+						{lanyard.presance.discord_user.discriminator} {/* ({lanyard.presance.discord_user.id}) */}
+					</title>
+				) : (
+					<title>Lanyard UI</title>
+				)}
+			</Helmet>
 			<Postition>
 				<Inputs />
 				<User />

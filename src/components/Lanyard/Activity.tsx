@@ -61,14 +61,14 @@ const ActivityName = styled.p`
 	display: inline-block;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	font-size: 1.5em;
-	margin-bottom: 3px;
+	font-size: 1.3em;
+	margin-bottom: 1px;
 	font-weight: bold;
 `;
 
 const ActivityDetails = styled(ActivityName)`
 	font-weight: normal;
-	font-size: 1.2em;
+	font-size: 1.15em;
 	margin: 0;
 `;
 
@@ -78,15 +78,6 @@ const Anchor = styled.a`
 	cursor: pointer;
 `;
 
-/*
-    {activity?.name}
-    {"\n"}
-    {activity?.details}
-    {"\n"}
-    {activity?.state}
-    {"\n"}
-    {resolveAsset(activity!.assets.large_image, activity!.application_id)}
-*/
 const Activity: FC = () => {
 	const state = useContext(AppContext);
 
@@ -126,22 +117,32 @@ const Activity: FC = () => {
 				<ActivityName>
 					{stringFromType(activity.type)} {activity.name}
 				</ActivityName>
-				<ActivityDetails>
-					{activity.type === 2 && activity.sync_id ? (
-						<Anchor
-							href={`https://open.spotify.com/track/${activity.sync_id}`}
-							target="_blank"
-							referrerPolicy="no-referrer"
-						>
-							{activity.details}
-						</Anchor>
-					) : (
-						activity.details
-					)}
-				</ActivityDetails>
-				<ActivityDetails>
-					{activity.type === 2 ? activity.state.split(";").join() : activity.state}
-				</ActivityDetails>
+				{activity.details && (
+					<ActivityDetails title={activity.details}>
+						{activity.type === 2 && activity.sync_id ? (
+							<Anchor
+								href={`https://open.spotify.com/track/${activity.sync_id}`}
+								target="_blank"
+								referrerPolicy="no-referrer"
+							>
+								{activity.details}
+							</Anchor>
+						) : (
+							activity.details
+						)}
+					</ActivityDetails>
+				)}
+
+				{activity.state && (
+					<ActivityDetails title={activity.type === 2 ? activity.state.split(";").join() : activity.state}>
+						{activity.type === 2 ? `by: ${activity.state.split(";").join()}` : activity.state}
+					</ActivityDetails>
+				)}
+				{activity.type === 2 && activity.assets.large_text && (
+					<ActivityDetails title={`${activity.assets.large_text}`}>
+						on: {activity.assets.large_text}
+					</ActivityDetails>
+				)}
 			</Collumn>
 		</ActivityWrapper>
 	);

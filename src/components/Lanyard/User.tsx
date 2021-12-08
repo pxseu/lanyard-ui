@@ -72,10 +72,10 @@ const Id = styled(Username)`
 
 const Status = styled.div<{ color: string }>`
 	position: absolute;
-	bottom: 10px;
-	right: 16px;
-	width: 25px;
-	height: 25px;
+	bottom: 8px;
+	right: 14px;
+	width: 30px;
+	height: 30px;
 	border-radius: 50%;
 	background-color: ${({ color }) => color};
 	border: 5px solid ${({ theme }) => theme.colors.presance};
@@ -105,7 +105,9 @@ const User: FC = () => {
 					<Avatar src={resolveAvatar(state.presance.discord_user)} />
 					<Status color={colorFromStatus(state.presance.discord_status)} />
 				</AvatarWrapper>
-				<Username>
+				<Username
+					title={`${state.presance.discord_user.username}#${state.presance.discord_user.discriminator}`}
+				>
 					{state.presance.discord_user.username}
 					<Discriminator>#{state.presance.discord_user.discriminator}</Discriminator>
 				</Username>

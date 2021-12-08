@@ -16,6 +16,7 @@ const KVWrapper = styled.div`
 	margin-bottom: 5px;
 	padding: 10px;
 	border-radius: 5px;
+	overflow: hidden;
 `;
 
 const KVInputWrapper = styled.span`
@@ -294,19 +295,7 @@ const KVElement: FC<{ data: [string, string] }> = ({ data }) => {
 					/>
 				</KVInputWrapper>
 
-				<KVButton onClick={reset} onKeyDown={(e) => onKeyDown(e, reset)} show={state.editing}>
-					<FaUndo />
-				</KVButton>
-
-				<KVButton
-					onClick={editingDone}
-					onKeyDown={(e) => onKeyDown(e, editingDone)}
-					show={state.editing}
-					hoverColors="#34a534"
-				>
-					<FaRegCheckCircle />
-				</KVButton>
-
+				{/* delete button */}
 				<KVButton
 					onClick={deleteValue}
 					onKeyDown={(e) => onKeyDown(e, deleteValue)}
@@ -314,6 +303,26 @@ const KVElement: FC<{ data: [string, string] }> = ({ data }) => {
 					hoverColors="#a53434"
 				>
 					<FaTrash />
+				</KVButton>
+
+				{/* cancel button */}
+				<KVButton
+					onClick={reset}
+					onKeyDown={(e) => onKeyDown(e, reset)}
+					show={state.editing}
+					hoverColors="#a59d34"
+				>
+					<FaUndo />
+				</KVButton>
+
+				{/* edit button */}
+				<KVButton
+					onClick={editingDone}
+					onKeyDown={(e) => onKeyDown(e, editingDone)}
+					show={state.editing}
+					hoverColors="#34a534"
+				>
+					<FaRegCheckCircle />
 				</KVButton>
 			</Row>
 			{state.error && (
