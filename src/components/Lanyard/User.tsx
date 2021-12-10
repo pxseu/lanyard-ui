@@ -83,12 +83,20 @@ const Status = styled.div<{ color: string }>`
 
 const User: FC = () => {
 	const state = useContext(AppContext);
-	const [bannerFailed, setBannerFailed] = useState(false);
+	const [banner, setBanner] = useState<string | undefined>(undefined);
 
 	useEffect(() => {
 		if (!state.presance) return;
+		let mounted = true;
 
-		setBannerFailed(false);
+		fetch(`https://dcdn.dstn.to/banners/${state.presance.discord_user.id}?size=2048`)
+			.then((res) => (res.ok ? res.blob() : Promise.reject(new Error("No banner"))))
+			.then((blob) => mounted && setBanner(URL.createObjectURL(blob)))
+			.catch(() => mounted && setBanner(undefined));
+
+		return () => {
+			mounted = false;
+		};
 	}, [state.presance?.discord_user.id]);
 
 	if (!state.presance) return null;
@@ -96,11 +104,7 @@ const User: FC = () => {
 	return (
 		<UserWrapper>
 			<Info>
-				<Banner
-					show={!bannerFailed}
-					src={`https://dcdn.dstn.to/banners/${state.presance.discord_user.id}?size=2048`}
-					onError={() => setBannerFailed(true)}
-				/>
+				<Banner show={!!banner} src={banner} />
 				<AvatarWrapper title={state.presance.discord_status}>
 					<Avatar src={resolveAvatar(state.presance.discord_user)} />
 					<Status color={colorFromStatus(state.presance.discord_status)} />

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/indent */
-import { FC, useContext, useEffect, useReducer } from "react";
+import { FC, useContext, useEffect, useReducer, useRef } from "react";
 import styled from "styled-components";
 import { FaRegCheckCircle, FaTrash, FaUndo } from "react-icons/fa";
 import { AppContext } from "App";
@@ -35,7 +35,6 @@ const KVButton = styled.button<{ show?: boolean; hoverColors?: string }>`
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-
 	height: 100%;
 	width: 40px;
 	display: ${({ show }) => (show ? "inital" : "none")};
@@ -240,12 +239,7 @@ const KVElement: FC<{ data: [string, string] }> = ({ data }) => {
 	});
 
 	const { request } = useContext(AppContext);
-
-	const onKeyDown = (e: React.KeyboardEvent<HTMLElement>, cb?: () => void) => {
-		if (e.key === "Enter") {
-			cb?.();
-		}
-	};
+	const wrapperRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		if (!state.sending) return;
@@ -276,6 +270,35 @@ const KVElement: FC<{ data: [string, string] }> = ({ data }) => {
 		};
 	}, [state.delete, state.sending]);
 
+	useEffect(() => {
+		let mounted = true;
+		let timeout: NodeJS.Timeout | null = null;
+
+		const handleIn = () => dispatch({ type: "hover" });
+		const handleOut = () =>
+			(timeout = setTimeout(() => {
+				if (wrapperRef.current && wrapperRef.current.contains(document.activeElement)) return;
+				if (!mounted) return;
+				dispatch({ type: "hover_out" });
+			}, 0));
+
+		wrapperRef.current?.addEventListener("focusin", handleIn);
+		wrapperRef.current?.addEventListener("focusout", handleOut);
+
+		return () => {
+			mounted = false;
+			if (timeout) clearTimeout(timeout);
+			wrapperRef.current?.removeEventListener("focusin", handleIn);
+			wrapperRef.current?.removeEventListener("focusout", handleOut);
+		};
+	}, [wrapperRef.current]);
+
+	const onKeyDown = (e: React.KeyboardEvent<HTMLElement>, cb?: () => void) => {
+		if (e.key === "Enter") {
+			cb?.();
+		}
+	};
+
 	const editingDone = () => state.editing && dispatch({ type: "edit_done" });
 	const deleteValue = () => dispatch({ type: "delete" });
 	const reset = () => state.editing && dispatch({ type: "edit_reset" });
@@ -284,6 +307,7 @@ const KVElement: FC<{ data: [string, string] }> = ({ data }) => {
 		<KVWrapper
 			onMouseEnter={() => dispatch({ type: "hover" })}
 			onMouseLeave={() => dispatch({ type: "hover_out" })}
+			ref={wrapperRef}
 		>
 			<Row>
 				<KVInputWrapper>

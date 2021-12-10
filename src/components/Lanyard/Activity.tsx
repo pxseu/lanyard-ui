@@ -1,5 +1,5 @@
 import { AppContext } from "App";
-import { Wrapper } from "components/Common";
+import { Anchor, Wrapper } from "components/Common";
 import { FC, useContext } from "react";
 import styled from "styled-components";
 import { stringFromType } from "utils/activity";
@@ -24,8 +24,8 @@ const Collumn = styled.div<{ flex?: boolean }>`
 
 const AssetWrapper = styled.div`
 	position: relative;
-	width: 110px;
-	height: 110px;
+	width: 120px;
+	height: 120px;
 	margin: 5px;
 	margin-right: 15px;
 `;
@@ -61,21 +61,14 @@ const ActivityName = styled.p`
 	display: inline-block;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	font-size: 1.3em;
-	margin-bottom: 1px;
+	font-size: 1.25em;
 	font-weight: bold;
 `;
 
 const ActivityDetails = styled(ActivityName)`
 	font-weight: normal;
-	font-size: 1.15em;
+	font-size: 1.1em;
 	margin: 0;
-`;
-
-const Anchor = styled.a`
-	color: ${({ theme }) => theme.colors.primary};
-	text-decoration: underline;
-	cursor: pointer;
 `;
 
 const Activity: FC = () => {

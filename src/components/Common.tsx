@@ -54,3 +54,21 @@ export const Input: FC<StyledComponentProps<"input", DefaultTheme, { noSelect?: 
 		}}
 	/>
 );
+
+export const Anchor = styled.a`
+	display: inline-block;
+	color: ${({ theme }) => theme.colors.primary};
+	text-decoration: underline;
+	cursor: pointer;
+	transition: outline 0.05s ease-in-out;
+	padding: 4px 0;
+	/* background-color: pink; */
+	border-radius: 7px;
+	outline-offset: -2px;
+
+	&:focus {
+		padding: 4px;
+		outline: 2px solid ${({ theme }) => theme.colors.outline};
+		text-decoration: none;
+	}
+`;
