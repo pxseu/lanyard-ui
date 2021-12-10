@@ -9,6 +9,7 @@ import KV from "components/Lanyard/KV";
 import { logger } from "utils/log";
 import { PRODUCTION } from "utils/consts";
 import { Helmet } from "react-helmet";
+import Credits from "components/Credits";
 
 export const AppContext = createContext<ReturnType<typeof useLanyard>>({
 	presance: null,
@@ -58,6 +59,7 @@ const App = () => {
 				<User />
 				<Activity />
 				<KV />
+				<Credits />
 			</Postition>
 		</AppContext.Provider>
 	);
