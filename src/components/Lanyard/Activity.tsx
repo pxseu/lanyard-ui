@@ -1,13 +1,13 @@
-import { AppContext } from "App";
 import { Anchor, Wrapper } from "components/Common";
-import { FC, useContext } from "react";
+import { useAppContext } from "hooks/useAppContext";
+import { FC } from "react";
 import styled from "styled-components";
 import { stringFromType } from "utils/activity";
 import { resolveAsset } from "utils/asset";
 import { resolveEmoji } from "utils/emoji";
 import { logger } from "utils/log";
 
-const log = logger("Activity");
+const activityLog = logger("Activity", true);
 
 const ActivityWrapper = styled(Wrapper)`
 	flex-direction: row;
@@ -72,13 +72,13 @@ const ActivityDetails = styled(ActivityName)`
 `;
 
 const Activity: FC = () => {
-	const state = useContext(AppContext);
+	const state = useAppContext();
 
 	if (!state.presance) return null;
 
 	const ordered = state.presance?.activities.sort((a, b) => a.type - b.type);
 
-	log(ordered);
+	activityLog(ordered);
 
 	const activity = ordered[0] ?? {
 		name: "Not doing anything",

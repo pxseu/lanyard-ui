@@ -1,7 +1,7 @@
-import { AppContext } from "App";
 import { Wrapper } from "components/Common";
+import { useAppContext } from "hooks/useAppContext";
 import { useEffect } from "react";
-import { FC, useContext, useState } from "react";
+import { FC, useState } from "react";
 import styled from "styled-components";
 import { colorFromStatus } from "utils/status";
 import { resolveAvatar } from "../../utils/avatar";
@@ -82,7 +82,7 @@ const Status = styled.div<{ color: string }>`
 `;
 
 const User: FC = () => {
-	const state = useContext(AppContext);
+	const state = useAppContext();
 	const [banner, setBanner] = useState<string | undefined>(undefined);
 
 	useEffect(() => {

@@ -1,6 +1,6 @@
-import { AppContext } from "App";
 import { Wrapper } from "components/Common";
-import { FC, useContext } from "react";
+import { useAppContext } from "hooks/useAppContext";
+import { FC } from "react";
 import styled from "styled-components";
 import KVElement from "./KVElement";
 
@@ -10,7 +10,7 @@ const KVWrapper = styled(Wrapper)`
 `;
 
 const KV: FC = () => {
-	const context = useContext(AppContext);
+	const context = useAppContext();
 
 	if (!context.presance) return null;
 

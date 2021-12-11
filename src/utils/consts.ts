@@ -1,3 +1,5 @@
+import { Presance } from "lanyard";
+
 const PREFIX_AND_VERSION = "lanyard:v1:" as const;
 
 export const PRODUCTION = process.env.REACT_APP_ENV?.toLowerCase() === "production";
@@ -13,3 +15,20 @@ export const LANYARD_BASE_URL = "https://api.lanyard.rest/v1" as const;
 export const SOCKET_URL = PRODUCTION ? "wss://lanyard.rest/socket?compression=zlib_json" : "wss://lanyard.rest/socket";
 export const AUTHOR_URL = "https://github.com/pxseu" as const;
 export const REPOSITORY_URL = `${AUTHOR_URL}/lanyard-ui` as const;
+export const PLACEHOLDER_PRESANCE = {
+	active_on_discord_desktop: false,
+	active_on_discord_mobile: false,
+	active_on_discord_web: false,
+	kv: {},
+	discord_user: {
+		avatar: null,
+		discriminator: "0".repeat(4),
+		id: "0".repeat(17),
+		username: "username",
+		public_flags: 0,
+	},
+	activities: [],
+	spotify: null,
+	discord_status: "offline",
+	listening_to_spotify: false,
+} as Presance;

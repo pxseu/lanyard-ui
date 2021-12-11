@@ -3,15 +3,17 @@ import { useEffect, useReducer, useRef } from "react";
 import type { Presance, SocketMessageRecieve, SocketMessageSend } from "lanyard";
 import { logger } from "utils/log";
 import {
-	KEY_ID,
 	PRESANCE_KEY,
 	SOCKET_URL,
 	USER_REGEX,
 	LANYARD_BASE_URL,
 	KEY_REGEX,
 	VALUE_MAX_LENGTH,
+	KEY_ID,
+	KEY_TOKEN,
 } from "utils/consts";
 import { parse, stringify } from "utils/parse";
+import { getPresance, getToken } from "utils/getCached";
 
 enum Events {
 	presance = "presance",
@@ -20,6 +22,7 @@ enum Events {
 	reconnect = "init",
 	subscribe = "subscribe",
 	token = "token",
+	toggleStore = "toggleStore",
 }
 
 enum Errors {
@@ -31,25 +34,19 @@ interface State {
 	connected: boolean;
 	subscibed: string | null;
 	token: string | null;
+	store: boolean;
 }
 
 type Action =
 	| {
-			type: Events.open;
-	  }
-	| {
-			type: Events.close;
+			type: Events.open | Events.close | Events.toggleStore;
 	  }
 	| {
 			type: Events.presance;
 			payload: Presance;
 	  }
 	| {
-			type: Events.subscribe;
-			payload: string;
-	  }
-	| {
-			type: Events.token;
+			type: Events.subscribe | Events.token;
 			payload: string;
 	  };
 
@@ -66,6 +63,7 @@ const reducer = (state: State, action: Action): State => {
 				connected: true,
 			};
 		}
+
 		case Events.close: {
 			socketLog("Socket closed");
 
@@ -90,6 +88,7 @@ const reducer = (state: State, action: Action): State => {
 
 		case Events.subscribe: {
 			lanyardLog("Subscibed to", action.payload);
+			localStorage.setItem(KEY_ID, action.payload);
 
 			return {
 				...state,
@@ -100,9 +99,24 @@ const reducer = (state: State, action: Action): State => {
 		case Events.token: {
 			lanyardLog("Token recieved");
 
+			if (state.store) localStorage.setItem(KEY_TOKEN, action.payload);
+
 			return {
 				...state,
 				token: action.payload,
+			};
+		}
+
+		case Events.toggleStore: {
+			lanyardLog("Toggled store");
+			const value = !state.store;
+
+			if (value) localStorage.setItem(KEY_TOKEN, state.token ?? "");
+			else localStorage.removeItem(KEY_TOKEN);
+
+			return {
+				...state,
+				store: value,
 			};
 		}
 
@@ -111,20 +125,13 @@ const reducer = (state: State, action: Action): State => {
 	}
 };
 
-const getLastPresance = () => {
-	const id = localStorage.getItem(KEY_ID);
-
-	if (!id) return null;
-
-	return JSON.parse(localStorage.getItem(PRESANCE_KEY) ?? "null") as Presance | null;
-};
-
 export const useLanyard = () => {
 	const [state, dispatch] = useReducer(reducer, {
-		presance: getLastPresance(),
+		presance: getPresance(),
 		connected: false,
 		subscibed: null,
-		token: null,
+		token: getToken(),
+		store: !!(getToken() || true),
 	});
 
 	const socket = useRef<WebSocket | null>(null);
@@ -173,6 +180,10 @@ export const useLanyard = () => {
 
 	const setToken = (token: string) => {
 		dispatch({ type: Events.token, payload: token });
+	};
+
+	const toggleStore = () => {
+		dispatch({ type: Events.toggleStore });
 	};
 
 	type Request = ((method: "PUT", key: string, data: string) => Promise<void>) &
@@ -324,9 +335,12 @@ export const useLanyard = () => {
 	return {
 		presance: state.presance,
 		connecting: !state.connected,
+		subscribed: state.subscibed,
+		store: state.store,
+		token: state.token,
 		subscribe,
 		setToken,
 		request,
-		subscribed: state.subscibed,
+		toggleStore,
 	};
 };

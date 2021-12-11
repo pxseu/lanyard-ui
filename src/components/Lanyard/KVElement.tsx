@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/indent */
-import { FC, useContext, useEffect, useReducer, useRef } from "react";
+import { FC, useEffect, useReducer, useRef } from "react";
 import styled from "styled-components";
 import { FaRegCheckCircle, FaTrash, FaUndo } from "react-icons/fa";
-import { AppContext } from "App";
 import { ErrorText, Input } from "components/Common";
+import { useAppContext } from "hooks/useAppContext";
 
 const KVWrapper = styled.div`
 	display: flex;
@@ -160,6 +160,7 @@ const reducer = (state: State, action: Action): State => {
 			if (state.initialKey === "" && state.initialValue === "")
 				return {
 					...state,
+					editing: false,
 					sending: false,
 					delete: false,
 					error: null,
@@ -180,8 +181,8 @@ const reducer = (state: State, action: Action): State => {
 				sending: false,
 				delete: false,
 				error: action.payload,
-				key: state.initialKey,
-				value: state.initialValue,
+				// key: state.initialKey,
+				// value: state.initialValue,
 			};
 
 		case "edit_reset":
@@ -195,7 +196,7 @@ const reducer = (state: State, action: Action): State => {
 		case "edit_done": {
 			return {
 				...state,
-				editing: false,
+				editing: true,
 				sending: true,
 			};
 		}
@@ -238,7 +239,7 @@ const KVElement: FC<{ data: [string, string] }> = ({ data }) => {
 		error: null,
 	});
 
-	const { request } = useContext(AppContext);
+	const { request } = useAppContext();
 	const wrapperRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {

@@ -11,14 +11,7 @@ import { PRODUCTION } from "utils/consts";
 import { Helmet } from "react-helmet";
 import Credits from "components/Credits";
 
-export const AppContext = createContext<ReturnType<typeof useLanyard>>({
-	presance: null,
-	connecting: true,
-	subscribe: async () => {},
-	setToken: () => {},
-	request: async () => {},
-	subscribed: null,
-});
+export const AppContext = createContext<ReturnType<typeof useLanyard> | null>(null);
 
 const Postition = styled.div`
 	margin-top: 10px;
@@ -39,6 +32,8 @@ const App = () => {
 		log("NODE_ENV", process.env.NODE_ENV);
 		log("PRODUCTION", PRODUCTION);
 	}, []);
+
+	console.log(lanyard.presance);
 
 	if (lanyard.connecting) return <Loader />;
 

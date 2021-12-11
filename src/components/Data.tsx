@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/indent */
-import { AppContext } from "App";
-import { FC, useContext, useEffect, useReducer } from "react";
+import { useAppContext } from "hooks/useAppContext";
+import { FC, useEffect, useReducer } from "react";
 import styled from "styled-components";
-import { KEY_ID, KEY_TOKEN } from "utils/consts";
-import { getId } from "utils/getId";
+import { getId } from "utils/getCached";
 import { ErrorText, Input, Wrapper } from "./Common";
 
 const InputTitle = styled.h2`
@@ -47,8 +46,6 @@ const InputGroup = styled.div`
 
 interface State {
 	id: string;
-	token: string;
-	store: boolean;
 	show: boolean;
 	error: null | { field: string; message: string };
 }
@@ -69,23 +66,9 @@ type Action =
 const reducer = (state: State, action: Action): State => {
 	switch (action.type) {
 		case "set_id": {
-			localStorage.setItem(KEY_ID, action.payload);
-
-			// not sure if this is the best way to do this
-			// if ("history" in window) history.pushState(null, "", `/${action.payload}`);
-
 			return {
 				...state,
 				id: action.payload,
-			};
-		}
-
-		case "set_token": {
-			if (state.store) localStorage.setItem(KEY_TOKEN, action.payload);
-
-			return {
-				...state,
-				token: action.payload,
 			};
 		}
 
@@ -94,18 +77,6 @@ const reducer = (state: State, action: Action): State => {
 				...state,
 				show: !state.show,
 			};
-
-		case "toggle_store": {
-			const value = !state.store;
-
-			if (value) localStorage.setItem(KEY_TOKEN, state.token);
-			else localStorage.removeItem(KEY_TOKEN);
-
-			return {
-				...state,
-				store: value,
-			};
-		}
 
 		case "set_error":
 			return {
@@ -119,25 +90,20 @@ const reducer = (state: State, action: Action): State => {
 				error: null,
 			};
 
-		default:
+		default: {
 			return state;
+		}
 	}
 };
 
 const Landing: FC = () => {
 	const [state, dispatch] = useReducer(reducer, {
 		id: getId(),
-		token: localStorage.getItem(KEY_TOKEN) ?? "",
-		store: !!localStorage.getItem(KEY_TOKEN),
 		show: false,
 		error: null,
 	});
 
-	const context = useContext(AppContext);
-
-	useEffect(() => {
-		context.setToken(state.token);
-	}, [state.token]);
+	const context = useAppContext();
 
 	useEffect(() => {
 		dispatch({ type: "clear_error" });
@@ -178,8 +144,8 @@ const Landing: FC = () => {
 					name="token"
 					type={state.show ? "text" : "password"}
 					autoComplete="token"
-					value={state.token}
-					onChange={(e) => dispatch({ type: "set_token", payload: e.target.value })}
+					value={context.token ?? ""}
+					onChange={(e) => context.setToken(e.target.value)}
 				/>
 				{state.error && state.error.field === "token" && <ErrorText>Error: {state.error.message}</ErrorText>}
 				<CheckboxSpan>
@@ -196,8 +162,8 @@ const Landing: FC = () => {
 					<Checkbox
 						name="store-token"
 						type="checkbox"
-						checked={state.store}
-						onChange={() => dispatch({ type: "toggle_store" })}
+						checked={context.store}
+						onChange={() => context.toggleStore()}
 					/>
 				</CheckboxSpan>
 			</InputGroup>
