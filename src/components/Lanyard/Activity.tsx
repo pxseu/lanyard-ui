@@ -1,13 +1,11 @@
 import { Anchor, Wrapper } from "components/Common";
+import { useFetchCached } from "hooks/fetchCached";
 import { useAppContext } from "hooks/useAppContext";
+import { Activity as ActivityType } from "lanyard";
 import { FC } from "react";
 import styled from "styled-components";
 import { stringFromType } from "utils/activity";
-import { resolveAsset } from "utils/asset";
-import { resolveEmoji } from "utils/emoji";
-import { logger } from "utils/log";
-
-const activityLog = logger("Activity", true);
+import { resolveActivity } from "utils/asset";
 
 const ActivityWrapper = styled(Wrapper)`
 	flex-direction: row;
@@ -30,7 +28,7 @@ const AssetWrapper = styled.div`
 	margin-right: 15px;
 `;
 
-const Asset = styled.img<{ emoji?: boolean }>`
+const Asset = styled.img<{ emoji?: boolean; show: boolean }>`
 	position: absolute;
 	top: ${({ emoji }) => (emoji ? "5%" : 0)};
 	left: ${({ emoji }) => (emoji ? "5%" : 0)};
@@ -40,6 +38,7 @@ const Asset = styled.img<{ emoji?: boolean }>`
 	${({ emoji }) => emoji && "object-fit: contain;"}
 	pointer-events: none;
 	user-select: none;
+	${({ show }) => !show && "display: none;"}
 `;
 
 const AssetSmaller = styled(Asset)`
@@ -74,36 +73,26 @@ const ActivityDetails = styled(ActivityName)`
 const Activity: FC = () => {
 	const state = useAppContext();
 
-	if (!state.presance) return null;
-
 	const ordered = state.presance?.activities.sort((a, b) => a.type - b.type);
-
-	activityLog(ordered);
-
-	const activity = ordered[0] ?? {
-		name: "Not doing anything",
-	};
-
-	// if (!activity) return null;
-
+	const activity =
+		ordered?.[0] ??
+		({
+			name: "Not doing anything",
+		} as ActivityType);
 	const isEmoji = activity.type === 4 && !!activity.emoji;
+
+	const asset = useFetchCached(resolveActivity(activity, "large"));
+	const assetSmaller = useFetchCached(resolveActivity(activity, "small"));
+
+	if (!state.presance) return null;
 
 	return (
 		<ActivityWrapper>
 			<Collumn>
 				<AssetWrapper title={activity.type === 4 && !!activity.emoji ? activity.emoji.name : activity.name}>
-					<Asset
-						emoji={isEmoji}
-						src={
-							activity.type === 4 && !!activity.emoji
-								? resolveEmoji(activity.emoji)
-								: resolveAsset(activity?.assets?.large_image, activity?.application_id)
-						}
-					/>
+					<Asset emoji={isEmoji} show={!!asset} src={asset} />
 
-					{activity.assets?.small_image && (
-						<AssetSmaller src={resolveAsset(activity.assets.small_image, activity.application_id)} />
-					)}
+					{activity.assets?.small_image && <AssetSmaller show={!!assetSmaller} src={assetSmaller} />}
 				</AssetWrapper>
 			</Collumn>
 			<Collumn flex>

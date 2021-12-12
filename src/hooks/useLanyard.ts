@@ -74,7 +74,6 @@ const reducer = (state: State, action: Action): State => {
 		}
 
 		case Events.presance: {
-			// FIXME: Unsubsribe ability?
 			if (state.subscibed && state.subscibed !== action.payload.discord_user.id) return state;
 
 			socketLog("Presance recieved", action.payload);
@@ -141,13 +140,11 @@ export const useLanyard = () => {
 
 	const waitUntilConnected = () =>
 		new Promise((resolve) => {
-			if (state.connected) return;
-
 			awaiting.current.push(resolve);
 		});
 
 	const send = async (data: SocketMessageSend, force: boolean = false) => {
-		if (!state.connected && !force) await waitUntilConnected();
+		if (!socket.current && !force) await waitUntilConnected();
 
 		socketLog("Sending", data);
 
@@ -156,19 +153,30 @@ export const useLanyard = () => {
 		socket.current!.send(message);
 	};
 
-	const subscribe = async (user: string) => {
-		if (state.subscibed === user && socket.current) return;
+	const subscribe = async (user: string, resubscribe: boolean = false) => {
+		if (!resubscribe && state.subscibed === user && socket.current) return;
 
 		if (!USER_REGEX.test(user)) throw new Error(Errors.notFound);
 
+		// fetch the user to check if they exist
 		try {
 			const res = await fetch(`${LANYARD_BASE_URL}/users/${user}`);
 			if (!res.ok) throw new Error(Errors.notFound);
+			res.json().then(({ data }) => dispatch({ type: Events.presance, payload: data }));
 		} catch (error) {
 			throw error;
 		}
 
-		dispatch({ type: Events.subscribe, payload: user });
+		// // if a user is already subscribed, unsubscribe
+		// if (subscribed.current && !resubscribe)
+		// 	send({
+		// 		op: 2,
+		// 		d: {
+		// 			unsubscribe_from_id: subscribed.current,
+		// 		},
+		// 	});
+
+		if (!resubscribe) dispatch({ type: Events.subscribe, payload: user });
 
 		send({
 			op: 2,
@@ -242,12 +250,10 @@ export const useLanyard = () => {
 		const handleOpen = (event: Event) => {
 			dispatch({ type: Events.open });
 
-			console.log(state.subscibed);
-
 			// if a user was subscibed before we assume it was a reconnect
 			if (subscribed.current) {
 				socketLog("Resubscibing to", subscribed.current);
-				subscribe(subscribed.current);
+				subscribe(subscribed.current, true);
 			}
 
 			if (awaiting.current.length) {

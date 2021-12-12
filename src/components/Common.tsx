@@ -14,7 +14,7 @@ export const Wrapper = styled.div`
 	max-width: 600px;
 	height: 100%;
 	background-color: ${({ theme }) => theme.colors.presance};
-	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
 `;
 
 export const ErrorText = styled.span`

@@ -33,8 +33,6 @@ const App = () => {
 		log("PRODUCTION", PRODUCTION);
 	}, []);
 
-	console.log(lanyard.presance);
-
 	if (lanyard.connecting) return <Loader />;
 
 	return (

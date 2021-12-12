@@ -13,6 +13,7 @@ const InputTitle = styled.h2`
 const DataInput = styled(Input)`
 	max-width: 300px;
 	background-color: ${({ theme }) => theme.colors.background};
+	box-shadow: 0 5px 4px rgba(0, 0, 0, 0.15);
 `;
 
 const CheckboxSpan = styled.span`

@@ -1,7 +1,7 @@
 import { Wrapper } from "components/Common";
+import { useFetchCached } from "hooks/fetchCached";
 import { useAppContext } from "hooks/useAppContext";
-import { useEffect } from "react";
-import { FC, useState } from "react";
+import { FC } from "react";
 import styled from "styled-components";
 import { colorFromStatus } from "utils/status";
 import { resolveAvatar } from "../../utils/avatar";
@@ -19,18 +19,6 @@ const AvatarWrapper = styled.div`
 	margin-bottom: 10px;
 `;
 
-const Avatar = styled.img`
-	width: 100%;
-	height: 100%;
-	border-radius: 50%;
-	z-index: 2;
-	pointer-events: none;
-	user-select: none;
-	padding: 5px;
-	background-color: ${({ theme }) => theme.colors.presance};
-	object-fit: cover;
-`;
-
 const Banner = styled.img<{ show: boolean }>`
 	position: absolute;
 	top: 0;
@@ -43,6 +31,13 @@ const Banner = styled.img<{ show: boolean }>`
 	${({ show }) => !show && "display: none;"};
 	pointer-events: none;
 	user-select: none;
+`;
+
+const Avatar = styled(Banner)`
+	border-radius: 50%;
+	z-index: 2;
+	padding: 5px;
+	background-color: ${({ theme }) => theme.colors.presance};
 `;
 
 const Info = styled.div`
@@ -79,25 +74,13 @@ const Status = styled.div<{ color: string }>`
 	border-radius: 50%;
 	background-color: ${({ color }) => color};
 	border: 5px solid ${({ theme }) => theme.colors.presance};
+	z-index: 2;
 `;
 
 const User: FC = () => {
 	const state = useAppContext();
-	const [banner, setBanner] = useState<string | undefined>(undefined);
-
-	useEffect(() => {
-		if (!state.presance) return;
-		let mounted = true;
-
-		fetch(`https://dcdn.dstn.to/banners/${state.presance.discord_user.id}?size=2048`)
-			.then((res) => (res.ok ? res.blob() : Promise.reject(new Error("No banner"))))
-			.then((blob) => mounted && setBanner(URL.createObjectURL(blob)))
-			.catch(() => mounted && setBanner(undefined));
-
-		return () => {
-			mounted = false;
-		};
-	}, [state.presance?.discord_user.id]);
+	const avatar = useFetchCached(resolveAvatar(state?.presance?.discord_user));
+	const banner = useFetchCached(`https://dcdn.dstn.to/banners/${state.presance?.discord_user.id}?size=2048`);
 
 	if (!state.presance) return null;
 
@@ -106,7 +89,7 @@ const User: FC = () => {
 			<Info>
 				<Banner show={!!banner} src={banner} />
 				<AvatarWrapper title={state.presance.discord_status}>
-					<Avatar src={resolveAvatar(state.presance.discord_user)} />
+					<Avatar show={!!avatar} src={avatar} />
 					<Status color={colorFromStatus(state.presance.discord_status)} />
 				</AvatarWrapper>
 				<Username
