@@ -67,10 +67,10 @@ const Id = styled(Username)`
 
 const Status = styled.div<{ color: string }>`
 	position: absolute;
-	bottom: 8px;
-	right: 14px;
-	width: 30px;
-	height: 30px;
+	bottom: 9px;
+	right: 16px;
+	width: 27px;
+	height: 27px;
 	border-radius: 50%;
 	background-color: ${({ color }) => color};
 	border: 5px solid ${({ theme }) => theme.colors.presance};
