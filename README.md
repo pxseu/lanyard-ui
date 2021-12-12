@@ -4,6 +4,8 @@
 
 > Simple UI to easily access kv and visualize your Discord User / Status with Lanyard
 
+Huge thanks to [@Phineas](https://github.com/phineas) for making this possible with [his amazing project](https://github.com/phineas/lanyard)!
+
 ## Before you start
 
 1. Make sure you've joined the [Lanyard Discord server](https://discord.gg/UrXF2cfJ7F)
