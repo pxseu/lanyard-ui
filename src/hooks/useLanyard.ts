@@ -167,14 +167,14 @@ export const useLanyard = () => {
 			throw error;
 		}
 
-		// // if a user is already subscribed, unsubscribe
-		// if (subscribed.current && !resubscribe)
-		// 	send({
-		// 		op: 2,
-		// 		d: {
-		// 			unsubscribe_from_id: subscribed.current,
-		// 		},
-		// 	});
+		// if a user is already subscribed, unsubscribe
+		if (subscribed.current && !resubscribe)
+			send({
+				op: 4,
+				d: {
+					unsubscribe_from_id: subscribed.current,
+				},
+			});
 
 		if (!resubscribe) dispatch({ type: Events.subscribe, payload: user });
 

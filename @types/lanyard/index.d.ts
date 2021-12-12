@@ -22,11 +22,15 @@ declare module "lanyard" {
 
 	export type SocketMessageSend =
 		| {
-				d: { subscribe_to_id: string } | { unsubscribe_from_id: string };
+				d: { subscribe_to_id: string };
 				op: 2;
 		  }
 		| {
 				op: 3;
+		  }
+		| {
+				op: 4;
+				d: { unsubscribe_from_id: string };
 		  };
 
 	export interface Presance {
