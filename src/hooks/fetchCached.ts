@@ -19,6 +19,9 @@ export const useFetchCached = (url: string | null): string | undefined => {
 		if (!url) return setOldUrl(url);
 		if (url.startsWith(DEFAULT_AVATAR_PATH)) return setDataWithUrl(url);
 
+		setData(undefined);
+		setOldUrl(null);
+
 		fetch(url)
 			.then((response) =>
 				response.ok ? response.blob() : Promise.reject(new Error("Network response was not ok.")),
