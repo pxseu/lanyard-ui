@@ -69,6 +69,7 @@ declare module "lanyard" {
 
 	export interface Timestamps {
 		start: number;
+		end?: number;
 	}
 
 	export interface Assets {

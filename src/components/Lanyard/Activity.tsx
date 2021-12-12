@@ -1,6 +1,7 @@
 import { Anchor, Wrapper } from "components/Common";
 import { useFetchCached } from "hooks/fetchCached";
 import { useAppContext } from "hooks/useAppContext";
+import { useTime } from "hooks/useTime";
 import { Activity as ActivityType } from "lanyard";
 import { FC } from "react";
 import styled from "styled-components";
@@ -9,6 +10,7 @@ import { resolveActivity } from "utils/asset";
 
 const ActivityWrapper = styled(Wrapper)`
 	flex-direction: row;
+	overflow: hidden;
 `;
 
 const Collumn = styled.div<{ flex?: boolean }>`
@@ -70,6 +72,16 @@ const ActivityDetails = styled(ActivityName)`
 	margin: 0;
 `;
 
+const ProgressBar = styled.div`
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: calc(var(--progress) * 1%);
+	height: 5px;
+	background-color: ${({ theme }) => theme.colors.primary};
+	border-radius: 5px;
+`;
+
 const Activity: FC = () => {
 	const state = useAppContext();
 
@@ -83,6 +95,7 @@ const Activity: FC = () => {
 
 	const asset = useFetchCached(resolveActivity(activity, "large"));
 	const assetSmaller = useFetchCached(resolveActivity(activity, "small"));
+	const time = useTime(activity.timestamps);
 
 	if (!state.presance) return null;
 
@@ -125,7 +138,16 @@ const Activity: FC = () => {
 						on: {activity.assets.large_text}
 					</ActivityDetails>
 				)}
+				{time && !time.end && <ActivityDetails title={time.start}>{time.start}</ActivityDetails>}
+
+				{/* {time && time.end && (
+					<ActivityDetails title={time.end}>
+						{time.start} - {time.end}
+					</ActivityDetails>
+				)} */}
 			</Collumn>
+			{/* @ts-expect-error stupid css */}
+			{time?.completion && <ProgressBar style={{ "--progress": time.completion }} />}
 		</ActivityWrapper>
 	);
 };

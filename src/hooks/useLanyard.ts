@@ -11,6 +11,8 @@ import {
 	VALUE_MAX_LENGTH,
 	KEY_ID,
 	KEY_TOKEN,
+	RECONNECT_INTERVAL,
+	MAX_RECONNECT_TIME,
 } from "utils/consts";
 import { parse, stringify } from "utils/parse";
 import { getPresance, getToken } from "utils/getCached";
@@ -137,6 +139,7 @@ export const useLanyard = () => {
 	const heartbeat = useRef<NodeJS.Timeout | null>(null);
 	const awaiting = useRef<((value: unknown) => void)[]>([]);
 	const subscribed = useRef<string | null>(null);
+	const reconnect = useRef<NodeJS.Timeout | null>(null);
 
 	const waitUntilConnected = () =>
 		new Promise((resolve) => {
@@ -238,7 +241,7 @@ export const useLanyard = () => {
 		);
 	};
 
-	const connect = () => {
+	const connect = (timeout?: number) => {
 		if (!socket.current) {
 			socket.current = new WebSocket(SOCKET_URL);
 			socket.current.binaryType = "arraybuffer";
@@ -277,7 +280,18 @@ export const useLanyard = () => {
 				heartbeat.current = null;
 			}
 
-			connect();
+			const time = timeout
+				? timeout > MAX_RECONNECT_TIME
+					? RECONNECT_INTERVAL + timeout
+					: RECONNECT_INTERVAL
+				: 0;
+
+			console.log(time);
+
+			reconnect.current = setTimeout(() => {
+				reconnect.current = null;
+				connect(timeout ?? RECONNECT_INTERVAL);
+			}, time);
 		};
 
 		const handleError = (event: Event) => {
