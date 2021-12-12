@@ -76,6 +76,7 @@ const reducer = (state: State, action: Action): State => {
 		}
 
 		case Events.presance: {
+			if (action.payload && Object.keys(action.payload).length === 0) return state;
 			if (state.subscibed && state.subscibed !== action.payload.discord_user.id) return state;
 
 			socketLog("Presance recieved", action.payload);
@@ -285,8 +286,6 @@ export const useLanyard = () => {
 					? RECONNECT_INTERVAL + timeout
 					: RECONNECT_INTERVAL
 				: 0;
-
-			console.log(time);
 
 			reconnect.current = setTimeout(() => {
 				reconnect.current = null;

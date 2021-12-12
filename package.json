@@ -5,7 +5,8 @@
 	"license": "MPL-2.0",
 	"scripts": {
 		"start": "react-scripts start",
-		"build": "REACT_APP_ENV=production GENERATE_SOURCEMAP=false react-scripts build",
+		"build": "REACT_APP_ENV=production GENERATE_SOURCEMAP=false yarn build:prod",
+		"build:prod": "react-scripts build",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject",
 		"lint": "eslint --ext .js,.ts,.tsx src/ --fix",
