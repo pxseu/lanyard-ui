@@ -1,3 +1,5 @@
+<img src="./public/assets/lanyard.png" width=300 />
+
 # Lanyard UI
 
 > Simple UI to easily access kv and visualize your Discord User / Status with Lanyard
@@ -6,24 +8,24 @@
 
 1. Make sure you've joined the [Lanyard Discord server](https://discord.gg/UrXF2cfJ7F)
 1. If you want to use the KV editor make sure to get your [Api Token](#token)
-1. Find your [Discord User ID](#user)
+1. Find your [Discord User ID](#user-id)
 
 ## User ID
 
 1. Open settings got to the `Advanced` tab and turn on `Developer Mode` \
-   ![](./.github/assets/discord_settings.png | width=100)
+   <img src="./.github/assets/discord_settings.png" width=500 />
 1. Still in settings go to `My Account` and click the three dots and copy your ID \
-   ![](./.github/assets/discord_id.png | width=100)
+   <img src="./.github/assets/discord_id.png" width=500 />
 
 ## Token
 
 > How do I get my Lanyard Token / Api Key?
 
 1. Open direct messages with the Lanyard bot \
-   ![](./.github/assets/server.png | width=100) \
-   ![](./.github/assets/lanyard_dm.png | width=100)
+   <img src="./.github/assets/server.png" width=500 /> \
+   <img src="./.github/assets/lanyard_dm.png" width=500 />
 1. Send a message with the following content: `.apikey` \
-   ![](./.github/assets/token_dm.png | width=100)
+    <img src="./.github/assets/token_dm.png" width=500 />
 1. Copy the token to a safe place
 
 ## Running Locally
