@@ -69,15 +69,16 @@ const AssetSmaller = styled(Asset)`
 	border-radius: 50%;
 `;
 
-const ActivityName = styled.p`
-	position: relative;
-	width: 100%;
+const ActivityName = styled.p<{ inline?: boolean }>`
 	display: inline-block;
+	position: relative;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	font-size: 1.25em;
 	font-weight: bold;
 	overflow: hidden;
+	width: 100%;
+	${({ inline }) => inline && "display: inline; width: unset;"}
 `;
 
 const ActivityDetails = styled(ActivityName)`
@@ -118,21 +119,23 @@ const Activity: FC = () => {
 				<ActivityName>
 					{stringFromType(activity.type)} {activity.name}
 				</ActivityName>
-				{activity.details && (
-					<ActivityDetails title={activity.details}>
-						{activity.type === 2 && activity.sync_id ? (
-							<Anchor
-								href={`https://open.spotify.com/track/${activity.sync_id}`}
-								target="_blank"
-								referrerPolicy="no-referrer"
+				{activity.details &&
+					(activity.type === 2 && activity.sync_id ? (
+						<Anchor
+							href={`https://open.spotify.com/track/${activity.sync_id}`}
+							target="_blank"
+							referrerPolicy="no-referrer"
+						>
+							<ActivityDetails
+								title={activity.details}
+								inline={activity.type === 2 && !!activity.sync_id}
 							>
 								{activity.details}
-							</Anchor>
-						) : (
-							activity.details
-						)}
-					</ActivityDetails>
-				)}
+							</ActivityDetails>
+						</Anchor>
+					) : (
+						<ActivityDetails title={activity.details}>{activity.details}</ActivityDetails>
+					))}
 
 				{activity.state && (
 					<ActivityDetails title={activity.type === 2 ? activity.state.split(";").join() : activity.state}>
@@ -144,13 +147,10 @@ const Activity: FC = () => {
 						on: {activity.assets.large_text}
 					</ActivityDetails>
 				)}
-				{time && !time.end && <ActivityDetails title={time.start}>{time.start}</ActivityDetails>}
-
-				{/* {time && time.end && (
-					<ActivityDetails title={time.end}>
-						{time.start} - {time.end}
-					</ActivityDetails>
-				)} */}
+				{time && time.start && !time.end && (
+					<ActivityDetails title={time.start}>{time.start} elapsed</ActivityDetails>
+				)}
+				{time && time.end && !time.start && <ActivityDetails title={time.end}>{time.end} left</ActivityDetails>}
 			</Collumn>
 
 			<Progress time={time} activity={activity.type} />

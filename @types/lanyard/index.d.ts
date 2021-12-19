@@ -68,7 +68,7 @@ declare module "lanyard" {
 	}
 
 	export interface Timestamps {
-		start: number;
+		start?: number;
 		end?: number;
 	}
 

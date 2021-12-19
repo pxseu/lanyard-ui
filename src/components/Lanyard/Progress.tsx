@@ -31,6 +31,7 @@ const BarWrapper = styled.div`
 const ProgressBar = styled.div<{ activity: number }>`
 	width: calc(var(--progress) * 1%);
 	height: 100%;
+	border-radius: 5px;
 	background-color: ${({ theme, activity }) => (activity === 2 ? theme.colors.spotify : theme.colors.primary)};
 `;
 

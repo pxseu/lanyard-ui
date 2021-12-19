@@ -55,7 +55,7 @@ export const Input: FC<StyledComponentProps<"input", DefaultTheme, { noSelect?: 
 	/>
 );
 
-export const Anchor = styled.a`
+export const Anchor = styled.a<{ elipsis?: boolean }>`
 	display: inline-block;
 	color: ${({ theme }) => theme.colors.primary};
 	text-decoration: underline;
@@ -65,6 +65,7 @@ export const Anchor = styled.a`
 	/* background-color: pink; */
 	border-radius: 7px;
 	outline-offset: -2px;
+	${({ elipsis }) => elipsis && "text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width: 100%"};
 
 	&:focus {
 		outline: 2px solid ${({ theme }) => theme.colors.outline};

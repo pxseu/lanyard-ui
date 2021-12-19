@@ -20,6 +20,11 @@ type Times =
 			start: string;
 			end: string;
 			completion: number;
+	  }
+	| {
+			start: null;
+			end: string;
+			completion: number;
 	  };
 
 const getTime = (timestamps?: Timestamps): Times | null => {
@@ -30,7 +35,7 @@ const getTime = (timestamps?: Timestamps): Times | null => {
 	if (!start && !end) return null;
 
 	const now = new Date();
-	const startDate = new Date(start);
+	const startDate = start ? new Date(start) : now;
 	const miliseconds = now.getTime() - startDate.getTime();
 	const days = Math.floor(miliseconds / DAY);
 	const hours = Math.floor((miliseconds % DAY) / HOUR);
@@ -38,11 +43,10 @@ const getTime = (timestamps?: Timestamps): Times | null => {
 	const seconds = Math.floor((miliseconds % MINUTE) / SECOND);
 
 	if (!end) {
-		if (days > 0)
-			return { start: `${days > 1 ? `${days} days` : `${days} day`} elapsed`, end: null, completion: null };
+		if (days > 0) return { start: `${days > 1 ? `${days} days` : `${days} day`}`, end: null, completion: null };
 
 		return {
-			start: `${hours ? `${hours}:` : ""}${padding(minutes)}:${padding(seconds)} elapsed`,
+			start: `${hours ? `${hours}:` : ""}${padding(minutes)}:${padding(seconds)}`,
 			end: null,
 			completion: null,
 		};
@@ -54,10 +58,20 @@ const getTime = (timestamps?: Timestamps): Times | null => {
 	const endMinutes = Math.floor((endMiliseconds % HOUR) / MINUTE);
 	const endSeconds = Math.floor((endMiliseconds % MINUTE) / SECOND);
 
+	const calc = Math.floor((miliseconds / endMiliseconds) * 10000) / 100;
+
+	if (!start) {
+		return {
+			start: null,
+			end: `${endHours ? `${endHours}:` : ""}${padding(endMinutes)}:${padding(endSeconds)}`,
+			completion: calc > 100 ? 100 : calc,
+		};
+	}
+
 	return {
 		start: `${hours ? `${hours}:` : ""}${padding(minutes)}:${padding(seconds)}`,
 		end: `${endHours ? `${endHours}:` : ""}${padding(endMinutes)}:${padding(endSeconds)}`,
-		completion: Math.floor((miliseconds / endMiliseconds) * 10000) / 100,
+		completion: calc > 100 ? 100 : calc,
 	};
 };
 
