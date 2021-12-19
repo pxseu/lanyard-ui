@@ -61,14 +61,33 @@ export const Anchor = styled.a`
 	text-decoration: underline;
 	cursor: pointer;
 	transition: outline 0.05s ease-in-out;
-	padding: 4px 0;
+	/* padding: 4px 0; */
 	/* background-color: pink; */
 	border-radius: 7px;
 	outline-offset: -2px;
 
 	&:focus {
-		padding: 4px;
 		outline: 2px solid ${({ theme }) => theme.colors.outline};
 		text-decoration: none;
+	}
+`;
+
+export const Button = styled.button`
+	margin: 10px 0;
+	padding: 5px 10px;
+	border-radius: 5px;
+	border: none;
+	background-color: ${({ theme }) => theme.colors.background};
+	color: ${({ theme }) => theme.colors.primary};
+	font-size: 1em;
+	cursor: pointer;
+	transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, outline 0.05s ease-in-out;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+
+	&:hover,
+	&:focus {
+		background-color: ${({ theme }) => theme.colors.background}aa;
+		box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+		outline: 2px solid ${({ theme }) => theme.colors.outline};
 	}
 `;

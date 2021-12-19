@@ -3,6 +3,7 @@ import { useFetchCached } from "hooks/fetchCached";
 import { useAppContext } from "hooks/useAppContext";
 import { FC } from "react";
 import styled from "styled-components";
+import { BANNER_PATH } from "utils/consts";
 import { colorFromStatus } from "utils/status";
 import { resolveAvatar } from "../../utils/avatar";
 
@@ -10,6 +11,10 @@ const UserWrapper = styled(Wrapper)`
 	border-radius: 10px;
 	overflow: hidden;
 	justify-content: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 10px;
 `;
 
 const AvatarWrapper = styled.div`
@@ -40,20 +45,25 @@ const Avatar = styled(Banner)`
 	background-color: ${({ theme }) => theme.colors.presance};
 `;
 
-const Info = styled.div`
+const TextWrapper = styled.div`
+	width: 90%;
+	z-index: 2;
 	display: flex;
-	flex-direction: column;
 	align-items: center;
-	padding: 10px;
+	justify-content: center;
 `;
 
-const Username = styled.div`
+const Username = styled.p`
+	max-width: 100%;
+	display: inline-block;
 	font-size: 2em;
 	margin-bottom: 5px;
-	z-index: 2;
 	background-color: ${({ theme }) => theme.colors.presance}50;
 	padding: 2px 5px;
 	border-radius: 5px;
+	flex-shrink: 1;
+	word-wrap: break-word;
+	text-align: center;
 `;
 
 const Discriminator = styled.span`
@@ -80,26 +90,28 @@ const Status = styled.div<{ color: string }>`
 const User: FC = () => {
 	const state = useAppContext();
 	const avatar = useFetchCached(resolveAvatar(state?.presance?.discord_user));
-	const banner = useFetchCached(`https://dcdn.dstn.to/banners/${state.presance?.discord_user.id}?size=2048`);
+	const banner = useFetchCached(`${BANNER_PATH}/${state.presance?.discord_user.id}?size=2048`);
 
 	if (!state.presance) return null;
 
 	return (
 		<UserWrapper>
-			<Info>
-				<Banner show={!!banner} src={banner} />
-				<AvatarWrapper title={state.presance.discord_status}>
-					<Avatar show={!!avatar} src={avatar} />
-					<Status color={colorFromStatus(state.presance.discord_status)} />
-				</AvatarWrapper>
+			<Banner show={!!banner} src={banner} alt="User banner" />
+			<AvatarWrapper title={state.presance.discord_status}>
+				<Avatar show={!!avatar} src={avatar} alt="User avatar" />
+				<Status color={colorFromStatus(state.presance.discord_status)} />
+			</AvatarWrapper>
+			<TextWrapper>
 				<Username
 					title={`${state.presance.discord_user.username}#${state.presance.discord_user.discriminator}`}
 				>
 					{state.presance.discord_user.username}
 					<Discriminator>#{state.presance.discord_user.discriminator}</Discriminator>
 				</Username>
-				<Id>{state.presance.discord_user.id}</Id>
-			</Info>
+			</TextWrapper>
+			<TextWrapper>
+				<Id title={state.presance.discord_user.id}>{state.presance.discord_user.id}</Id>
+			</TextWrapper>
 		</UserWrapper>
 	);
 };

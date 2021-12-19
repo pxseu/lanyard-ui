@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import App from "./App";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 import theme from "utils/theme";
+import ErrorBoundary from "components/Boundary";
 
 const Global = createGlobalStyle`
 	*, *:before, *:after {
@@ -20,8 +21,6 @@ const Global = createGlobalStyle`
 		min-height: 100vh;
 		display: flex;
 		flex-direction: column;
-		padding-top: 20px;
-		padding-bottom: 20px;
 	}
 
 	#root {
@@ -38,7 +37,9 @@ ReactDOM.render(
 		<ThemeProvider theme={theme}>
 			<Global />
 
-			<App />
+			<ErrorBoundary>
+				<App />
+			</ErrorBoundary>
 		</ThemeProvider>
 	</StrictMode>,
 	document.getElementById("root"),

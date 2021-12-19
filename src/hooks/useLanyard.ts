@@ -52,8 +52,8 @@ type Action =
 			payload: string;
 	  };
 
-const socketLog = logger("Socket");
-const lanyardLog = logger("Lanyard");
+const socketLog = logger("info", "Socket", true);
+const lanyardLog = logger("info", "Lanyard");
 
 const reducer = (state: State, action: Action): State => {
 	switch (action.type) {
@@ -76,10 +76,11 @@ const reducer = (state: State, action: Action): State => {
 		}
 
 		case Events.presance: {
+			lanyardLog("Presance recieved", action.payload);
+
 			if (action.payload && Object.keys(action.payload).length === 0) return state;
 			if (state.subscibed && state.subscibed !== action.payload.discord_user.id) return state;
 
-			socketLog("Presance recieved", action.payload);
 			localStorage.setItem(PRESANCE_KEY, JSON.stringify(action.payload));
 
 			return {

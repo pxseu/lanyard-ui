@@ -5,9 +5,11 @@ import styled from "styled-components";
 import { getId } from "utils/getCached";
 import { ErrorText, Input, Wrapper } from "./Common";
 
-const InputTitle = styled.h2`
+const InputTitle = styled.label`
+	font-weight: bold;
 	font-size: 1.5rem;
 	margin-bottom: 0.5rem;
+	text-align: center;
 `;
 
 const DataInput = styled(Input)`
@@ -23,8 +25,8 @@ const CheckboxSpan = styled.span`
 
 const Checkbox = styled.input`
 	margin-left: 0.3rem;
-	width: 1.2rem;
-	height: 1.2rem;
+	width: 1.5rem;
+	height: 1.5rem;
 	vertical-align: middle;
 	border-radius: 5px;
 	padding: 5px;
@@ -128,46 +130,56 @@ const Landing: FC = () => {
 
 	return (
 		<Wrapper>
-			<InputGroup>
-				<InputTitle>Discord Id:</InputTitle>
-				<DataInput
-					name="id"
-					autoComplete="id"
-					type="text"
-					value={state.id}
-					onChange={(e) => dispatch({ type: "set_id", payload: e.target.value })}
-				/>
-				{state.error && state.error.field === "id" && <ErrorText>Error: {state.error.message}</ErrorText>}
-			</InputGroup>
-			<InputGroup>
-				<InputTitle>Lanyard api token:</InputTitle>
-				<DataInput
-					name="token"
-					type={state.show ? "text" : "password"}
-					autoComplete="token"
-					value={context.token ?? ""}
-					onChange={(e) => context.setToken(e.target.value)}
-				/>
-				{state.error && state.error.field === "token" && <ErrorText>Error: {state.error.message}</ErrorText>}
-				<CheckboxSpan>
-					<label htmlFor="show-token">Show token:</label>
-					<Checkbox
-						name="show-token"
-						type="checkbox"
-						checked={state.show}
-						onChange={() => dispatch({ type: "toggle_show" })}
+			<form action="" onSubmit={(e) => e.preventDefault()}>
+				<InputGroup>
+					<InputTitle htmlFor="discord-id">Discord Id:</InputTitle>
+					<DataInput
+						id="discord-id"
+						name="discord-id"
+						autoComplete="discord-id"
+						type="text"
+						value={state.id}
+						onChange={(e) => dispatch({ type: "set_id", payload: e.target.value })}
 					/>
-				</CheckboxSpan>
-				<CheckboxSpan>
-					<label htmlFor="store-token">Keep token stored:</label>
-					<Checkbox
-						name="store-token"
-						type="checkbox"
-						checked={context.store}
-						onChange={() => context.toggleStore()}
+					{state.error && state.error.field === "id" && <ErrorText>Error: {state.error.message}</ErrorText>}
+				</InputGroup>
+				<InputGroup>
+					<InputTitle htmlFor="lanyard-token">Lanyard api token:</InputTitle>
+					<DataInput
+						id="lanyard-token"
+						name="lanyard-token"
+						type={state.show ? "text" : "password"}
+						autoComplete="lanyard-token"
+						value={context.token ?? ""}
+						onChange={(e) => context.setToken(e.target.value)}
 					/>
-				</CheckboxSpan>
-			</InputGroup>
+					{state.error && state.error.field === "token" && (
+						<ErrorText>Error: {state.error.message}</ErrorText>
+					)}
+				</InputGroup>
+				<InputGroup>
+					<CheckboxSpan>
+						<label htmlFor="show-token">Show token:</label>
+						<Checkbox
+							id="show-token"
+							name="show-token"
+							type="checkbox"
+							checked={state.show}
+							onChange={() => dispatch({ type: "toggle_show" })}
+						/>
+					</CheckboxSpan>
+					<CheckboxSpan>
+						<label htmlFor="store-token">Keep token stored:</label>
+						<Checkbox
+							id="store-token"
+							name="store-token"
+							type="checkbox"
+							checked={context.store}
+							onChange={() => context.toggleStore()}
+						/>
+					</CheckboxSpan>
+				</InputGroup>
+			</form>
 		</Wrapper>
 	);
 };

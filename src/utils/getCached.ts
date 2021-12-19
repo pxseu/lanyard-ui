@@ -24,15 +24,22 @@ export const getToken = (): string | null => {
 const idMatchesPresance = (presance: Presance): boolean => {
 	const stored = getRawId();
 
-	if (presance.discord_user.id === stored) return true;
+	if (presance?.discord_user?.id === stored) return true;
 
 	return false;
 };
 
 const getRawPresance = (): Presance | null => {
 	const presance = localStorage.getItem(PRESANCE_KEY);
-	if (presance) return JSON.parse(presance);
-	return null;
+
+	try {
+		if (presance) return JSON.parse(presance);
+		return null;
+	} catch (e) {
+		throw e;
+		localStorage.removeItem(PRESANCE_KEY);
+		return null;
+	}
 };
 
 export const getPresance = () => {

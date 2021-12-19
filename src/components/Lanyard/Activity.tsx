@@ -7,10 +7,16 @@ import { FC } from "react";
 import styled from "styled-components";
 import { stringFromType } from "utils/activity";
 import { resolveActivity } from "utils/asset";
+import Progress from "./Progress";
 
 const ActivityWrapper = styled(Wrapper)`
 	flex-direction: row;
 	overflow: hidden;
+	flex-wrap: wrap;
+
+	@media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+		flex-direction: column;
+	}
 `;
 
 const Collumn = styled.div<{ flex?: boolean }>`
@@ -20,6 +26,10 @@ const Collumn = styled.div<{ flex?: boolean }>`
 	justify-content: center;
 	height: 100%;
 	${({ flex }) => flex && "flex: 1; width: 100%; overflow: hidden; margin-right: 10px;"}
+
+	@media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+		${({ flex }) => flex && "padding: 10px; margin-right: 0;"}
+	}
 `;
 
 const AssetWrapper = styled.div`
@@ -28,6 +38,10 @@ const AssetWrapper = styled.div`
 	height: 120px;
 	margin: 5px;
 	margin-right: 15px;
+
+	@media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+		margin: 5px;
+	}
 `;
 
 const Asset = styled.img<{ emoji?: boolean; show: boolean }>`
@@ -57,29 +71,19 @@ const AssetSmaller = styled(Asset)`
 
 const ActivityName = styled.p`
 	position: relative;
-	overflow: hidden;
 	width: 100%;
 	display: inline-block;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	font-size: 1.25em;
 	font-weight: bold;
+	overflow: hidden;
 `;
 
 const ActivityDetails = styled(ActivityName)`
 	font-weight: normal;
 	font-size: 1.1em;
 	margin: 0;
-`;
-
-const ProgressBar = styled.div`
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	width: calc(var(--progress) * 1%);
-	height: 5px;
-	background-color: ${({ theme }) => theme.colors.primary};
-	border-radius: 5px;
 `;
 
 const Activity: FC = () => {
@@ -103,9 +107,11 @@ const Activity: FC = () => {
 		<ActivityWrapper>
 			<Collumn>
 				<AssetWrapper title={activity.type === 4 && !!activity.emoji ? activity.emoji.name : activity.name}>
-					<Asset emoji={isEmoji} show={!!asset} src={asset} />
+					<Asset emoji={isEmoji} show={!!asset} src={asset} alt="Activity asset" />
 
-					{activity.assets?.small_image && <AssetSmaller show={!!assetSmaller} src={assetSmaller} />}
+					{activity.assets?.small_image && (
+						<AssetSmaller show={!!assetSmaller} src={assetSmaller} alt="Smaller activity asset" />
+					)}
 				</AssetWrapper>
 			</Collumn>
 			<Collumn flex>
@@ -146,8 +152,8 @@ const Activity: FC = () => {
 					</ActivityDetails>
 				)} */}
 			</Collumn>
-			{/* @ts-expect-error stupid css */}
-			{time?.completion && <ProgressBar style={{ "--progress": time.completion }} />}
+
+			<Progress time={time} activity={activity.type} />
 		</ActivityWrapper>
 	);
 };
