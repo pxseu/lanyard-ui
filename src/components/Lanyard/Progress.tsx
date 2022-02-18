@@ -36,7 +36,9 @@ const ProgressBar = styled.div<{ activity: number }>`
 `;
 
 const ProgressTime = styled.p`
-	font-size: 0.6rem;
+	/* TODO: find good fontsize */
+	font-size: 0.75em;
+	font-weight: normal;
 	margin: 0 5px;
 	color: ${({ theme }) => theme.colors.primary};
 	font-weight: normal;

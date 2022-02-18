@@ -42,6 +42,43 @@ const InputBase = styled.input`
 	}
 `;
 
+const TextAreaBase = styled.textarea`
+	width: 100%;
+	flex: 1;
+	border: none;
+	background-color: ${({ theme }) => theme.colors.presance};
+	color: ${({ theme }) => theme.colors.primary};
+	font-size: 1rem;
+	padding: 10px;
+	border-radius: 5px;
+	transition: outline 0.05s ease-in-out;
+	resize: vertical;
+	min-height: 80px;
+
+	&:focus {
+		outline: 2px solid ${({ theme }) => theme.colors.outline};
+	}
+
+	&:disabled {
+		color: ${({ theme }) => theme.colors.primary}aa;
+	}
+`;
+
+export const TextArea: FC<StyledComponentProps<"textarea", DefaultTheme, { noSelect?: boolean }, never>> = ({
+	noSelect,
+	className,
+	...props
+}) => (
+	<TextAreaBase
+		className={`${InputBase.toString().substring(1)}${className ? ` ${className}` : ""}`}
+		{...props}
+		onFocus={(e) => {
+			if (!noSelect) e.target.select();
+			props?.onFocus?.(e);
+		}}
+	/>
+);
+
 export const Input: FC<StyledComponentProps<"input", DefaultTheme, { noSelect?: boolean }, never>> = ({
 	noSelect,
 	...props

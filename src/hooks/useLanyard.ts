@@ -202,7 +202,7 @@ export const useLanyard = () => {
 	type Request = ((method: "PUT", key: string, data: string) => Promise<void>) &
 		((method: "DELETE", key: string) => Promise<void>);
 
-	const request: Request = async (method: "PUT" | "DELETE", key: string, data?: string) => {
+	const keyRequest: Request = async (method: "PUT" | "DELETE", key: string, data?: string) => {
 		if (!state.subscibed) throw new Error("Not subscibed");
 		if (!state.token) throw new Error("No token");
 		if (!KEY_REGEX.test(key)) throw new Error("No or invalid key was provided");
@@ -360,7 +360,7 @@ export const useLanyard = () => {
 		token: state.token,
 		subscribe,
 		setToken,
-		request,
+		keyRequest,
 		toggleStore,
 	};
 };

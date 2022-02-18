@@ -1,13 +1,22 @@
 import { Activity, Emoji } from "lanyard";
 import { PLACEHOLDER, UNKNOWN_ALBUM } from "./consts";
 
-const resolveAsset = (asset?: string, applicationId?: string, id?: string) => {
-	const isSpotify = id?.startsWith("spotify:") || false;
+const resolveAsset = (asset?: string, applicationId?: string) => {
+	const split = asset?.split(":") || [];
 
-	// if asset is a spotify asset resolve it
-	if (isSpotify && asset) return `https://i.scdn.co/image/${asset?.split(":")[1]}`;
+	// sicne the asset split on colon it can be spotify or ext
+	if (split.length > 1) {
+		if (split[0] === "spotify") {
+			// if the asset is 1 it's unknown
+			if (split[1] === "1") return UNKNOWN_ALBUM;
 
-	if (isSpotify) return UNKNOWN_ALBUM;
+			// it's probably fine
+			return `https://i.scdn.co/image/${split[1]}`;
+		}
+
+		// external discord asset thing
+		return `https://media.discordapp.net/${split[1]}`;
+	}
 
 	// if no asset is provided return default image
 	if (!applicationId || !asset) return PLACEHOLDER;
@@ -39,5 +48,5 @@ export const resolveActivity = (activity: Activity | undefined, type: "large" | 
 
 	if (activity.type === 4 && !!activity.emoji) return resolveEmoji(activity.emoji);
 
-	return resolveAsset(activity.assets?.large_image, activity.application_id, activity.id);
+	return resolveAsset(activity.assets?.large_image || activity.id, activity.application_id);
 };

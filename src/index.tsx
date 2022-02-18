@@ -30,6 +30,24 @@ const Global = createGlobalStyle`
 		display: flex;
 		flex-direction: column;
 	}
+
+	::-webkit-scrollbar {
+		width: 7px;
+		background: transparent;
+	}
+
+	::-webkit-scrollbar-thumb {
+		background: ${theme.colors.outline};
+		border-radius: 5px;
+	}
+
+	::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	::-webkit-scrollbar-button {
+		display: none;
+	}
 `;
 
 ReactDOM.render(
