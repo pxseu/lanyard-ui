@@ -1,6 +1,6 @@
 import { Wrapper } from "components/Common";
 import { useFetchCached } from "hooks/fetchCached";
-import { useAppContext } from "hooks/useAppContext";
+import { useAppContext } from "hooks/useContexts";
 import { FC } from "react";
 import styled from "styled-components";
 import { BANNER_PATH } from "utils/consts";

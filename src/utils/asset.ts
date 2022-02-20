@@ -1,7 +1,7 @@
 import { Activity, Emoji } from "lanyard";
 import { PLACEHOLDER, UNKNOWN_ALBUM } from "./consts";
 
-const resolveAsset = (asset?: string, applicationId?: string) => {
+const resolveAsset = (applicationId?: string, asset?: string) => {
 	const split = asset?.split(":") || [];
 
 	// sicne the asset split on colon it can be spotify or ext
@@ -18,11 +18,13 @@ const resolveAsset = (asset?: string, applicationId?: string) => {
 		return `https://media.discordapp.net/${split[1]}`;
 	}
 
+	if (applicationId && !asset) return `https://dcdn.dstn.to/app-icons/${applicationId}.webp?size=512`;
+
 	// if no asset is provided return default image
 	if (!applicationId || !asset) return PLACEHOLDER;
 
 	// if asset is a url return it
-	return `https://cdn.discordapp.com/app-assets/${applicationId}/${asset}.webp`;
+	return `https://cdn.discordapp.com/app-assets/${applicationId}/${asset}.webp?size=512`;
 };
 
 const resolveEmoji = (emoji: Emoji) => {
@@ -43,10 +45,13 @@ export const resolveActivity = (activity: Activity | undefined, type: "large" | 
 
 	if (type !== "large")
 		return activity?.assets?.small_image
-			? resolveAsset(activity?.assets?.small_image, activity?.application_id)
+			? resolveAsset(activity?.application_id, activity?.assets?.small_image)
 			: null;
 
 	if (activity.type === 4 && !!activity.emoji) return resolveEmoji(activity.emoji);
 
-	return resolveAsset(activity.assets?.large_image || activity.id, activity.application_id);
+	const largeImage =
+		activity?.assets?.large_image ?? (activity?.id?.startsWith("spotify:") ? activity.id : undefined);
+
+	return resolveAsset(activity.application_id, largeImage);
 };

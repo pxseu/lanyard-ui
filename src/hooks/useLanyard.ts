@@ -15,7 +15,7 @@ import {
 	MAX_RECONNECT_TIME,
 } from "utils/consts";
 import { parse, stringify } from "utils/parse";
-import { getPresance, getToken } from "utils/getCached";
+import { getPresence, getToken } from "utils/getCached";
 
 enum Events {
 	presance = "presance",
@@ -76,7 +76,7 @@ const reducer = (state: State, action: Action): State => {
 		}
 
 		case Events.presance: {
-			lanyardLog("Presance recieved", action.payload);
+			lanyardLog("Presence recieved", action.payload);
 
 			if (action.payload && Object.keys(action.payload).length === 0) return state;
 			if (state.subscibed && state.subscibed !== action.payload.discord_user.id) return state;
@@ -130,7 +130,7 @@ const reducer = (state: State, action: Action): State => {
 
 export const useLanyard = () => {
 	const [state, dispatch] = useReducer(reducer, {
-		presance: getPresance(),
+		presance: getPresence(),
 		connected: false,
 		subscibed: null,
 		token: getToken(),

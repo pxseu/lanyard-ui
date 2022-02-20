@@ -1,6 +1,6 @@
 import { Anchor, Wrapper } from "components/Common";
 import { useFetchCached } from "hooks/fetchCached";
-import { useAppContext } from "hooks/useAppContext";
+import { useAppContext } from "hooks/useContexts";
 import { useTime } from "hooks/useTime";
 import { Activity as ActivityType } from "lanyard";
 import { FC } from "react";

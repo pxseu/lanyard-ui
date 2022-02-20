@@ -21,7 +21,7 @@ export const getToken = (): string | null => {
 	return localStorage.getItem(KEY_TOKEN);
 };
 
-const idMatchesPresance = (presance: Presance): boolean => {
+const idMatchesPresence = (presance: Presance): boolean => {
 	const stored = getRawId();
 
 	if (presance?.discord_user?.id === stored) return true;
@@ -29,7 +29,7 @@ const idMatchesPresance = (presance: Presance): boolean => {
 	return false;
 };
 
-const getRawPresance = (): Presance | null => {
+const getRawPresence = (): Presance | null => {
 	const presance = localStorage.getItem(PRESANCE_KEY);
 
 	try {
@@ -42,10 +42,10 @@ const getRawPresance = (): Presance | null => {
 	}
 };
 
-export const getPresance = () => {
-	const presance = getRawPresance();
+export const getPresence = () => {
+	const presance = getRawPresence();
 
-	if (presance && idMatchesPresance(presance)) return presance;
+	if (presance && idMatchesPresence(presance)) return presance;
 
 	return PLACEHOLDER_PRESANCE;
 };
