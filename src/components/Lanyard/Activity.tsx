@@ -1,21 +1,33 @@
 import { Anchor, Wrapper } from "components/Common";
 import { useFetchCached } from "hooks/fetchCached";
-import { useAppContext } from "hooks/useContexts";
 import { useTime } from "hooks/useTime";
 import { Activity as ActivityType } from "lanyard";
-import { FC } from "react";
+import React, { FC } from "react";
 import styled from "styled-components";
 import { stringFromType } from "utils/activity";
 import { resolveActivity } from "utils/asset";
 import Progress from "./Progress";
 
 const ActivityWrapper = styled(Wrapper)`
+	margin: 0;
+	margin-top: 2px;
+	margin-bottom: 2px;
+	box-shadow: none;
 	flex-direction: row;
 	overflow: hidden;
 	flex-wrap: wrap;
+	box-sizing: border-box;
+	--border-width: 2px;
+	border-radius: 0;
+	border-right: var(--border-width) solid ${({ theme }) => theme.colors.outline};
+	border-left: var(--border-width) solid ${({ theme }) => theme.colors.outline};
 
 	@media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
 		flex-direction: column;
+	}
+
+	&:focus {
+		border: none;
 	}
 `;
 
@@ -87,25 +99,19 @@ const ActivityDetails = styled(ActivityName)`
 	margin: 0;
 `;
 
-const Activity: FC = () => {
-	const state = useAppContext();
+interface ActivityProps {
+	activity: ActivityType;
+	focused: boolean;
+}
 
-	const ordered = state.presance?.activities.sort((a, b) => a.type - b.type);
-	const activity =
-		ordered?.[0] ??
-		({
-			name: "Not doing anything",
-		} as ActivityType);
+const Activity: FC<ActivityProps> = ({ activity, focused }) => {
 	const isEmoji = activity.type === 4 && !!activity.emoji;
-
 	const asset = useFetchCached(resolveActivity(activity, "large"));
 	const assetSmaller = useFetchCached(resolveActivity(activity, "small"));
 	const time = useTime(activity.timestamps);
 
-	if (!state.presance) return null;
-
 	return (
-		<ActivityWrapper>
+		<ActivityWrapper tabIndex={focused ? 0 : undefined}>
 			<Collumn>
 				<AssetWrapper title={activity.type === 4 && !!activity.emoji ? activity.emoji.name : activity.name}>
 					<Asset emoji={isEmoji} show={!!asset} src={asset} alt="Activity asset" />
@@ -125,6 +131,7 @@ const Activity: FC = () => {
 							href={`https://open.spotify.com/track/${activity.sync_id}`}
 							target="_blank"
 							referrerPolicy="no-referrer"
+							tabIndex={focused ? 0 : -1}
 						>
 							<ActivityDetails
 								title={activity.details}

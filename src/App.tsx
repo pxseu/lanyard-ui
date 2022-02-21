@@ -4,12 +4,12 @@ import Inputs from "components/Data";
 import { createContext, FC, useEffect } from "react";
 import User from "components/Lanyard/User";
 import styled from "styled-components";
-import Activity from "components/Lanyard/Activity";
 import KV from "components/Lanyard/KV";
 import { logger } from "utils/log";
 import { PRODUCTION } from "utils/consts";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import Credits from "components/Credits";
+import Activities from "components/Lanyard/ActivitiesWrapper";
 
 export const AppContext = createContext<ReturnType<typeof useLanyard> | null>(null);
 
@@ -33,7 +33,7 @@ const App: FC = () => {
 		log("PRODUCTION", PRODUCTION);
 	}, []);
 
-	if (lanyard.connecting) return <Loader />;
+	if (lanyard.connecting || !lanyard.presance) return <Loader />;
 
 	return (
 		<HelmetProvider>
@@ -51,7 +51,7 @@ const App: FC = () => {
 				<Postition>
 					<Inputs />
 					<User />
-					<Activity />
+					<Activities />
 					<KV />
 					<Credits />
 				</Postition>

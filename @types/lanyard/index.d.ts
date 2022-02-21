@@ -73,10 +73,10 @@ declare module "lanyard" {
 	}
 
 	export interface Assets {
-		small_text: string;
-		small_image: string;
-		large_text: string;
-		large_image: string;
+		small_text?: string;
+		small_image?: string;
+		large_text?: string;
+		large_image?: string;
 	}
 
 	export interface Emoji {

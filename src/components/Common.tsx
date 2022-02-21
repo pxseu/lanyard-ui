@@ -15,6 +15,11 @@ export const Wrapper = styled.div`
 	height: 100%;
 	background-color: ${({ theme }) => theme.colors.presance};
 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+
+	&:focus {
+		border-radius: 10px;
+		outline: 2px solid ${({ theme }) => theme.colors.outline};
+	}
 `;
 
 export const ErrorText = styled.span`

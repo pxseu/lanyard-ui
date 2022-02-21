@@ -33,6 +33,7 @@ const Global = createGlobalStyle`
 
 	::-webkit-scrollbar {
 		width: 7px;
+		height: 7px;
 		background: transparent;
 	}
 
