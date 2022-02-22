@@ -16,18 +16,26 @@ const ActivityWrapper = styled(Wrapper)`
 	flex-direction: row;
 	overflow: hidden;
 	flex-wrap: wrap;
-	box-sizing: border-box;
+
 	--border-width: 2px;
 	border-radius: 0;
-	border-right: var(--border-width) solid ${({ theme }) => theme.colors.outline};
-	border-left: var(--border-width) solid ${({ theme }) => theme.colors.outline};
+	box-shadow: var(--border-width) 0px 0px 0px ${({ theme }) => theme.colors.outline},
+		calc(-1 * var(--border-width)) 0px 0px 0px ${({ theme }) => theme.colors.outline};
+
+	--gap: 20px;
+	margin-left: var(--gap);
+	margin-right: var(--gap);
+
+	&:only-child {
+		--gap: 0;
+	}
 
 	@media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
 		flex-direction: column;
 	}
 
 	&:focus {
-		border: none;
+		box-shadow: none;
 	}
 `;
 
@@ -46,8 +54,8 @@ const Collumn = styled.div<{ flex?: boolean }>`
 
 const AssetWrapper = styled.div`
 	position: relative;
-	width: 120px;
-	height: 120px;
+	width: 110px;
+	height: 110px;
 	margin: 5px;
 	margin-right: 15px;
 

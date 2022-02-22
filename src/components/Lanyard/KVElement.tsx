@@ -1,22 +1,9 @@
-/* eslint-disable @typescript-eslint/indent */
 import { FC, useEffect, useReducer, useRef } from "react";
 import styled from "styled-components";
 import { FaRegCheckCircle, FaTrash, FaUndo } from "react-icons/fa";
-import { ErrorText, Input, TextArea } from "components/Common";
+import { ElementWrapper, ErrorText, Input, MotionButton, TextArea } from "components/Common";
 import { useAppContext } from "hooks/useContexts";
 import { motion, AnimatePresence, Variants } from "framer-motion";
-
-const KVWrapper = styled.div`
-	display: flex;
-	justify-content: space-between;
-	width: 100%;
-	background-color: ${({ theme }) => theme.colors.background};
-	margin-top: 5px;
-	margin-bottom: 5px;
-	padding: 10px 14px;
-	border-radius: 5px;
-	overflow: hidden;
-`;
 
 const KVInputWrapper = styled.span`
 	display: flex;
@@ -28,23 +15,13 @@ const KVInputWrapper = styled.span`
 	transition: width 0.3s ease-in-out;
 `;
 
-const KVButton = styled(motion.button)<{ show?: boolean; hovercolors?: string }>`
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	height: 100%;
-	width: 40px;
-	font-size: 1.2rem;
+const KVButton = styled(MotionButton)<{ show?: boolean; hovercolors?: string }>`
+	width: 45px;
 	margin-left: 8px;
 	padding: 8px;
-	background-color: ${({ theme }) => theme.colors.presance};
-	color: ${({ theme }) => theme.colors.primary};
-	border: none;
 	transition: color 0.1s ease-in-out, outline 0.05s ease-in-out;
 
 	&:focus {
-		display: "initial";
 		${({ hovercolors: hoverColors }) => hoverColors && `color: ${hoverColors};`}
 		outline: 2px solid ${({ theme }) => theme.colors.outline};
 	}
@@ -114,16 +91,17 @@ type Action =
 	  }
 	| {
 			type: "error";
-			payload: string;
+			payload: string | null;
 	  };
 
 const buttonVariants: Variants = {
 	initial: {
 		opacity: 0,
-		display: "none",
+		scale: 0.2,
 	},
 	hover: {
 		opacity: 1,
+		scale: 1,
 		display: "flex",
 	},
 };
@@ -276,7 +254,9 @@ const reducer = (state: State, action: Action): State => {
 	}
 };
 
-const KVElement: FC<{ data: [string, string] }> = ({ data }) => {
+type KVElementProps = Parameters<typeof ElementWrapper>[0] & { data: [string, string] };
+
+const KVElement: FC<KVElementProps> = ({ data, ...props }) => {
 	const [state, dispatch] = useReducer(reducer, {
 		initialKey: data[0],
 		key: data[0],
@@ -291,7 +271,7 @@ const KVElement: FC<{ data: [string, string] }> = ({ data }) => {
 		focused: false,
 	});
 
-	const { keyRequest } = useAppContext();
+	const { kvApi, kvValidate } = useAppContext();
 	const wrapperRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -299,24 +279,23 @@ const KVElement: FC<{ data: [string, string] }> = ({ data }) => {
 
 		let mounted = true;
 
-		if (state.delete && state.initialKey) {
-			keyRequest("DELETE", state.initialKey).then(
-				() => mounted && dispatch({ type: "request_done" }),
-				(e) => mounted && dispatch({ type: "error", payload: e.message }),
-			);
-		} else {
-			if (state.initialKey && state.key !== state.initialKey) {
-				Promise.all([keyRequest("PUT", state.key, state.value), keyRequest("DELETE", state.initialKey)]).then(
-					() => mounted && dispatch({ type: "request_done" }),
-					(e) => mounted && dispatch({ type: "error", payload: e.message }),
-				);
-			} else {
-				keyRequest("PUT", state.key, state.value).then(
-					() => mounted && dispatch({ type: "request_done" }),
-					(e) => mounted && dispatch({ type: "error", payload: e.message }),
-				);
-			}
+		async function makeRequest() {
+			// if there is a initial key and action is delete we send a delete request
+			if (state.delete && state.initialKey) return kvApi("DELETE", state.initialKey);
+
+			// TODO: ask for patch method so i dont have to do this stupid shit x
+			if (state.initialKey && state.key !== state.initialKey)
+				return Promise.all([kvApi("PUT", state.key, state.value), kvApi("DELETE", state.initialKey)]);
+
+			// if nothing matches we assume it's new and send a put request
+			return kvApi("PUT", state.key, state.value);
 		}
+
+		// do state stuff
+		makeRequest().then(
+			() => mounted && dispatch({ type: "request_done" }),
+			(e) => mounted && dispatch({ type: "error", payload: e.message }),
+		);
 
 		return () => {
 			mounted = false;
@@ -349,6 +328,23 @@ const KVElement: FC<{ data: [string, string] }> = ({ data }) => {
 		};
 	}, [wrapperRef.current]);
 
+	useEffect(() => {
+		let mounted = true;
+
+		if (!state.key || !state.value) return;
+
+		try {
+			kvValidate(state.key, state.value);
+			if (mounted) dispatch({ type: "error", payload: null });
+		} catch (e) {
+			if (mounted && e instanceof Error) dispatch({ type: "error", payload: e.message });
+		}
+
+		return () => {
+			mounted = false;
+		};
+	}, [state.key, state.value]);
+
 	const onKeyDown = (event: React.KeyboardEvent<HTMLElement>, cb?: () => void) => {
 		if (event.key === "Enter" && !event.shiftKey) {
 			cb?.();
@@ -360,80 +356,95 @@ const KVElement: FC<{ data: [string, string] }> = ({ data }) => {
 	const reset = () => state.editing && dispatch({ type: "edit_reset" });
 
 	return (
-		<KVWrapper
+		<ElementWrapper
 			onMouseEnter={() => dispatch({ type: "hover" })}
 			onMouseLeave={() => dispatch({ type: "hover_out" })}
 			ref={wrapperRef}
+			{...props}
 		>
-			<AnimatePresence>
-				<Collumn flexgrow="1" key="kv-inputs">
-					<KVInputWrapper>
-						<Input
-							value={state.key}
-							onChange={(e) => dispatch({ type: "set_key", payload: e.target.value })}
-							placeholder="key"
-							required={state.editing}
-							disabled={state.sending}
-							onKeyDown={(e) => onKeyDown(e, editingDone)}
-						/>
-
-						<CenterCollumn>
+			<Collumn flexgrow="1">
+				<KVInputWrapper>
+					<Input
+						value={state.key}
+						onChange={(e) => dispatch({ type: "set_key", payload: e.target.value })}
+						placeholder="key"
+						required={state.editing}
+						disabled={state.sending}
+						onKeyDown={(e) => onKeyDown(e, editingDone)}
+					/>
+					<CenterCollumn>
+						<AnimatePresence>
 							{/* delete button */}
-							<KVButton
-								onClick={deleteValue}
-								onKeyDown={(e) => onKeyDown(e, deleteValue)}
-								variants={buttonVariants}
-								hovercolors="#a53434"
-								animate={
-									(state.editing || state.hover) && !!state.initialKey && !!state.initialValue
-										? "hover"
-										: "initial"
-								}
-							>
-								<FaTrash />
-							</KVButton>
-						</CenterCollumn>
-					</KVInputWrapper>
+							{(state.editing || state.hover) && !!state.initialKey && !!state.initialValue && (
+								<KVButton
+									onClick={deleteValue}
+									onKeyDown={(e) => onKeyDown(e, deleteValue)}
+									hovercolors="#a53434"
+									transition={{ duration: 0.2 }}
+									variants={buttonVariants}
+									initial="initial"
+									animate="hover"
+									exit="initial"
+									key="kv__delete-button"
+								>
+									<FaTrash fontSize={20} />
+								</KVButton>
+							)}
+						</AnimatePresence>
+					</CenterCollumn>
+				</KVInputWrapper>
 
-					<KVInputWrapper>
-						<TextArea
-							value={state.value}
-							onChange={(e) => dispatch({ type: "set_value", payload: e.target.value })}
-							placeholder="value"
-							required={state.editing}
-							disabled={state.sending}
-							onKeyDown={(e) => onKeyDown(e, editingDone)}
-						/>
-
-						<CenterCollumn>
+				<KVInputWrapper>
+					<TextArea
+						value={state.value}
+						onChange={(e) => dispatch({ type: "set_value", payload: e.target.value })}
+						placeholder="value"
+						required={state.editing}
+						disabled={state.sending}
+						onKeyDown={(e) => onKeyDown(e, editingDone)}
+					/>
+					<CenterCollumn>
+						<AnimatePresence>
 							{/* cancel button */}
-							<KVButton
-								onClick={reset}
-								onKeyDown={(e) => onKeyDown(e, reset)}
-								animate={state.editing ? "hover" : "initial"}
-								hovercolors="#a59d34"
-								variants={buttonVariants}
-							>
-								<FaUndo />
-							</KVButton>
+							{state.editing && (
+								<KVButton
+									onClick={reset}
+									onKeyDown={(e) => onKeyDown(e, reset)}
+									hovercolors="#a59d34"
+									transition={{ duration: 0.2 }}
+									variants={buttonVariants}
+									initial="initial"
+									animate="hover"
+									exit="initial"
+									key="kv__edit-button"
+								>
+									<FaUndo fontSize={20} />
+								</KVButton>
+							)}
 
 							{/* edit button */}
-							<KVButton
-								onClick={editingDone}
-								onKeyDown={(e) => onKeyDown(e, editingDone)}
-								animate={state.editing ? "hover" : "initial"}
-								hovercolors="#34a534"
-								variants={buttonVariants}
-							>
-								<FaRegCheckCircle />
-							</KVButton>
-						</CenterCollumn>
-					</KVInputWrapper>
+							{state.editing && (
+								<KVButton
+									onClick={editingDone}
+									onKeyDown={(e) => onKeyDown(e, editingDone)}
+									hovercolors="#34a534"
+									transition={{ duration: 0.2 }}
+									variants={buttonVariants}
+									initial="initial"
+									animate="hover"
+									exit="initial"
+									key="kv__submit-button"
+								>
+									<FaRegCheckCircle fontSize={20} />
+								</KVButton>
+							)}
+						</AnimatePresence>
+					</CenterCollumn>
+				</KVInputWrapper>
 
-					{state.error && <ErrorText>Error: {state.error}</ErrorText>}
-				</Collumn>
-			</AnimatePresence>
-		</KVWrapper>
+				{state.error && <ErrorText>Error: {state.error}</ErrorText>}
+			</Collumn>
+		</ElementWrapper>
 	);
 };
 

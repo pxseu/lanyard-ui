@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { FC } from "react";
 import styled, { DefaultTheme, StyledComponentProps } from "styled-components";
 
@@ -25,6 +26,7 @@ export const Wrapper = styled.div`
 export const ErrorText = styled.span`
 	color: ${({ theme }) => theme.colors.error};
 	font-size: 1.2rem;
+	text-align: center;
 `;
 
 const InputBase = styled.input`
@@ -116,21 +118,64 @@ export const Anchor = styled.a<{ elipsis?: boolean }>`
 `;
 
 export const Button = styled.button`
-	margin: 10px 0;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	margin: 0;
 	padding: 5px 10px;
 	border-radius: 5px;
 	border: none;
-	background-color: ${({ theme }) => theme.colors.background};
+	background-color: ${({ theme }) => theme.colors.presance};
 	color: ${({ theme }) => theme.colors.primary};
 	font-size: 1em;
 	cursor: pointer;
 	transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, outline 0.05s ease-in-out;
-	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+
+	/* box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); */
 
 	&:hover,
 	&:focus {
-		background-color: ${({ theme }) => theme.colors.background}aa;
-		box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+		background-color: ${({ theme }) => theme.colors.presance};
 		outline: 2px solid ${({ theme }) => theme.colors.outline};
+		/* box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5); */
 	}
+`;
+
+export const MotionButton = styled(motion.button)`
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	margin: 0;
+	height: 100%;
+	padding: 5px 10px;
+	border-radius: 5px;
+	border: none;
+	background-color: ${({ theme }) => theme.colors.presance};
+	color: ${({ theme }) => theme.colors.primary};
+	font-size: 1em;
+	cursor: pointer;
+	transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, outline 0.05s ease-in-out;
+
+	/* box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); */
+
+	&:hover,
+	&:focus {
+		background-color: ${({ theme }) => theme.colors.presance};
+		outline: 2px solid ${({ theme }) => theme.colors.outline};
+		/* box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5); */
+	}
+`;
+
+export const ElementWrapper = styled(motion.div)`
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
+	background-color: ${({ theme }) => theme.colors.background};
+	margin-top: 5px;
+	margin-bottom: 5px;
+	padding: 10px 14px;
+	border-radius: 5px;
+	overflow: hidden;
 `;

@@ -11,13 +11,13 @@ declare module "lanyard" {
 				op: 0;
 				seq: 1;
 				t: "INIT_STATE";
-				d: Presance;
+				d: Presence;
 		  }
 		| {
 				op: 0;
 				seq: 2;
 				t: "PRESENCE_UPDATE";
-				d: Presance;
+				d: Presence;
 		  };
 
 	export type SocketMessageSend =
@@ -33,7 +33,7 @@ declare module "lanyard" {
 				d: { unsubscribe_from_id: string };
 		  };
 
-	export interface Presance {
+	export interface Presence {
 		spotify: any;
 		listening_to_spotify: boolean;
 		kv: Record<string, string>;

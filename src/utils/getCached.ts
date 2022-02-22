@@ -1,4 +1,4 @@
-import { Presance } from "lanyard";
+import { Presence } from "lanyard";
 import { DEFAULT_ID_VALUE, KEY_ID, KEY_TOKEN, PLACEHOLDER_PRESANCE, PRESANCE_KEY, USER_REGEX } from "./consts";
 
 const getRawId = (): string | null => {
@@ -21,7 +21,7 @@ export const getToken = (): string | null => {
 	return localStorage.getItem(KEY_TOKEN);
 };
 
-const idMatchesPresence = (presance: Presance): boolean => {
+const idMatchesPresence = (presance: Presence): boolean => {
 	const stored = getRawId();
 
 	if (presance?.discord_user?.id === stored) return true;
@@ -29,7 +29,7 @@ const idMatchesPresence = (presance: Presance): boolean => {
 	return false;
 };
 
-const getRawPresence = (): Presance | null => {
+const getRawPresence = (): Presence | null => {
 	const presance = localStorage.getItem(PRESANCE_KEY);
 
 	try {

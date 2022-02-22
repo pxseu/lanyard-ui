@@ -26,7 +26,6 @@ const ActivityWrapper = styled(Wrapper)`
 	overflow-x: auto;
 	overscroll-behavior-inline: contain;
 	scroll-snap-type: x mandatory;
-	gap: 30px;
 
 	& > div {
 		display: flex;

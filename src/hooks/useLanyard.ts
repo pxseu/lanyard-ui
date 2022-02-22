@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/indent */
 import { useEffect, useReducer, useRef } from "react";
-import type { Presance, SocketMessageRecieve, SocketMessageSend } from "lanyard";
+import type { Presence, SocketMessageRecieve, SocketMessageSend } from "lanyard";
 import { logger } from "utils/log";
 import {
 	PRESANCE_KEY,
@@ -13,12 +13,14 @@ import {
 	KEY_TOKEN,
 	RECONNECT_INTERVAL,
 	MAX_RECONNECT_TIME,
+	KEY_MAX_LENGTH,
+	MAX_KEYS_AMMOUNT,
 } from "utils/consts";
 import { parse, stringify } from "utils/parse";
 import { getPresence, getToken } from "utils/getCached";
 
 enum Events {
-	presance = "presance",
+	presance = "presence",
 	open = "open",
 	close = "close",
 	reconnect = "init",
@@ -32,7 +34,7 @@ enum Errors {
 }
 
 interface State {
-	presance: Presance | null;
+	presence: Presence | null;
 	connected: boolean;
 	subscibed: string | null;
 	token: string | null;
@@ -45,7 +47,7 @@ type Action =
 	  }
 	| {
 			type: Events.presance;
-			payload: Presance;
+			payload: Presence;
 	  }
 	| {
 			type: Events.subscribe | Events.token;
@@ -79,13 +81,13 @@ const reducer = (state: State, action: Action): State => {
 			lanyardLog("Presence recieved", action.payload);
 
 			if (action.payload && Object.keys(action.payload).length === 0) return state;
-			if (state.subscibed && state.subscibed !== action.payload.discord_user.id) return state;
+			if (state.subscibed && state.subscibed !== action.payload.discord_user?.id) return state;
 
 			localStorage.setItem(PRESANCE_KEY, JSON.stringify(action.payload));
 
 			return {
 				...state,
-				presance: action.payload,
+				presence: action.payload,
 			};
 		}
 
@@ -130,7 +132,7 @@ const reducer = (state: State, action: Action): State => {
 
 export const useLanyard = () => {
 	const [state, dispatch] = useReducer(reducer, {
-		presance: getPresence(),
+		presence: getPresence(),
 		connected: false,
 		subscibed: null,
 		token: getToken(),
@@ -202,11 +204,20 @@ export const useLanyard = () => {
 	type Request = ((method: "PUT", key: string, data: string) => Promise<void>) &
 		((method: "DELETE", key: string) => Promise<void>);
 
-	const keyRequest: Request = async (method: "PUT" | "DELETE", key: string, data?: string) => {
+	const kvValidate = (key: string, data?: string) => {
+		if (key === "") throw new Error("Key cannot be empty");
+		if (key.length > KEY_MAX_LENGTH) throw new Error(`Key cannot be longer than ${KEY_MAX_LENGTH} characters`);
+		if (!KEY_REGEX.test(key)) throw new Error("Key must be an alphanumeric string with underscores");
+		if (data && data.length > VALUE_MAX_LENGTH) throw new Error(`Value cannot be longer than ${VALUE_MAX_LENGTH}`);
+	};
+
+	const kvApi: Request = async (method: "PUT" | "DELETE", key: string, data?: string) => {
 		if (!state.subscibed) throw new Error("Not subscibed");
 		if (!state.token) throw new Error("No token");
-		if (!KEY_REGEX.test(key)) throw new Error("No or invalid key was provided");
-		if (data && data.length > VALUE_MAX_LENGTH) throw new Error(`Value cannpt be longer than ${VALUE_MAX_LENGTH}`);
+		if (Object.entries(state.presence?.kv ?? {}).length >= MAX_KEYS_AMMOUNT)
+			throw new Error("You have reached the maximum amount of keys");
+
+		kvValidate(key, data);
 
 		const res = await fetch(`${LANYARD_BASE_URL}/users/${state.subscibed}/kv/${key}`, {
 			method,
@@ -353,14 +364,15 @@ export const useLanyard = () => {
 	}, [state.subscibed]);
 
 	return {
-		presance: state.presance,
+		presance: state.presence,
 		connecting: !state.connected,
 		subscribed: state.subscibed,
 		store: state.store,
 		token: state.token,
 		subscribe,
 		setToken,
-		keyRequest,
+		kvApi,
+		kvValidate,
 		toggleStore,
 	};
 };
