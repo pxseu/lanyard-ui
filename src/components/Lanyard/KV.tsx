@@ -13,8 +13,8 @@ const KVWrapper = styled(Wrapper)`
 `;
 
 const KV_ANIMATION_VARIANTS: Variants = {
-	animate: { opacity: 1, height: "auto" },
-	initial: { opacity: 0.2, height: 0 },
+	animate: { opacity: 1, height: "auto", paddingTop: "", paddingBottom: "", marginTop: "", marginBottom: "" },
+	initial: { opacity: 0.2, height: 0, paddingTop: 0, paddingBottom: 0, marginTop: 0, marginBottom: 0 },
 };
 
 const KV: FC = () => {
@@ -24,13 +24,10 @@ const KV: FC = () => {
 
 	if (!context.presance) return null;
 
-	const kv = Object.entries(context.presance?.kv).map((data) => ({
-		key: data.join(":"),
-		data,
-	}));
+	const kv = Object.entries(context.presance?.kv);
 
 	const sorted = sorthook.sorter(kv);
-	const filtered = !filter ? sorted : sorted.filter(({ key }) => key.includes(filter));
+	const filtered = !filter ? sorted : sorted.filter(([key, value]) => key.includes(filter) || value.includes(filter));
 
 	return (
 		<KVWrapper>
@@ -41,9 +38,9 @@ const KV: FC = () => {
 			<KVElement data={["", ""]} />
 
 			<AnimatePresence initial={false}>
-				{filtered.map(({ key, data }) => (
+				{filtered.map((data) => (
 					<KVElement
-						key={key}
+						key={data[0]}
 						data={data}
 						initial="initial"
 						animate="animate"

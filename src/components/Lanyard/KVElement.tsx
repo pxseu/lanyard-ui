@@ -170,9 +170,12 @@ const reducer = (state: State, action: Action): State => {
 
 			return {
 				...state,
+				editing: false,
 				sending: false,
 				delete: false,
 				error: null,
+				initialKey: state.key,
+				initialValue: state.value,
 			};
 
 		case "error":
@@ -281,18 +284,21 @@ const KVElement: FC<KVElementProps> = ({ data, ...props }) => {
 
 		async function makeRequest() {
 			// if there is a initial key and action is delete we send a delete request
-			if (state.delete && state.initialKey) return kvApi("DELETE", state.initialKey);
+			if (state.delete && state.initialKey) return kvApi("DELETE", `/${encodeURIComponent(state.initialKey)}`);
 
 			// TODO: ask for patch method so i dont have to do this stupid shit x
 			if (state.initialKey && state.key !== state.initialKey)
-				return Promise.all([kvApi("PUT", state.key, state.value), kvApi("DELETE", state.initialKey)]);
+				return Promise.all([
+					kvApi("DELETE", `/${encodeURIComponent(state.initialKey)}`),
+					kvApi("PUT", `/${encodeURIComponent(state.key)}`, state.value),
+				]);
 
 			// if nothing matches we assume it's new and send a put request
-			return kvApi("PUT", state.key, state.value);
+			return kvApi("PUT", `/${state.key}`, state.value);
 		}
 
 		// do state stuff
-		makeRequest().then(
+		void makeRequest().then(
 			() => mounted && dispatch({ type: "request_done" }),
 			(e) => mounted && dispatch({ type: "error", payload: e.message }),
 		);

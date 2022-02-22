@@ -4,14 +4,14 @@ import { SORT_KEY } from "utils/consts";
 type SortTypes = "asc" | "desc";
 
 interface Required {
-	key: string;
+	0: string;
 }
 
 const sortFunc = (arr: Required[], sort: SortTypes) => {
 	if (!sort) return arr;
 	return arr.sort((a, b) => {
-		if (sort === "asc") return a.key > b.key ? 1 : -1;
-		return a.key < b.key ? 1 : -1;
+		if (sort === "asc") return a[0] > b[0] ? 1 : -1;
+		return a[0] < b[0] ? 1 : -1;
 	});
 };
 

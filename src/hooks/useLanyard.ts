@@ -201,9 +201,6 @@ export const useLanyard = () => {
 		dispatch({ type: Events.toggleStore });
 	};
 
-	type Request = ((method: "PUT", key: string, data: string) => Promise<void>) &
-		((method: "DELETE", key: string) => Promise<void>);
-
 	const kvValidate = (key: string, data?: string) => {
 		if (key === "") throw new Error("Key cannot be empty");
 		if (key.length > KEY_MAX_LENGTH) throw new Error(`Key cannot be longer than ${KEY_MAX_LENGTH} characters`);
@@ -211,20 +208,23 @@ export const useLanyard = () => {
 		if (data && data.length > VALUE_MAX_LENGTH) throw new Error(`Value cannot be longer than ${VALUE_MAX_LENGTH}`);
 	};
 
-	const kvApi: Request = async (method: "PUT" | "DELETE", key: string, data?: string) => {
+	type Request = ((method: "PUT", path: string, body: string) => Promise<void>) &
+		((method: "PATCH", path: string, data: string) => Promise<void>) &
+		((method: "DELETE", path: string) => Promise<void>);
+
+	const kvApi: Request = async (method: "PUT" | "PATCH" | "DELETE", path: string, body?: any) => {
 		if (!state.subscibed) throw new Error("Not subscibed");
 		if (!state.token) throw new Error("No token");
 		if (Object.entries(state.presence?.kv ?? {}).length >= MAX_KEYS_AMMOUNT)
 			throw new Error("You have reached the maximum amount of keys");
 
-		kvValidate(key, data);
-
-		const res = await fetch(`${LANYARD_BASE_URL}/users/${state.subscibed}/kv/${key}`, {
+		const res = await fetch(`${LANYARD_BASE_URL}/users/${state.subscibed}/kv${path}`, {
 			method,
 			headers: {
+				"Content-Type": "application/json",
 				Authorization: state.token,
 			},
-			body: data,
+			body,
 		});
 
 		if (!res.ok)
@@ -239,7 +239,6 @@ export const useLanyard = () => {
 				default:
 					throw new Error("Unknown error");
 			}
-
 		// return res.json();
 	};
 
