@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/indent */
+import { AnimatePresence, motion, Variants } from "framer-motion";
 import { useAppContext } from "hooks/useContexts";
 import { FC, useEffect, useReducer } from "react";
 import styled from "styled-components";
 import { getId } from "utils/getCached";
-import { ErrorText, Input, Wrapper } from "./Common";
+import { Button, ErrorText, Input, Wrapper } from "./Common";
 
 const InputTitle = styled.label`
 	font-weight: bold;
@@ -47,10 +48,44 @@ const InputGroup = styled.div`
 	width: 100%;
 `;
 
+const DataButton = styled(Button)`
+	margin-bottom: 20px;
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+	width: 90%;
+	max-width: 600px;
+`;
+
+const AniamtedWrapper = motion(Wrapper);
+
+const WrapperVariants: Variants = {
+	initial: {
+		height: "auto",
+		opacity: 1,
+		marginBottom: 20,
+		padding: 10,
+
+		transition: {
+			duration: 0.2,
+		},
+	},
+	collapsed: {
+		height: 0,
+		marginBottom: 0,
+		padding: 0,
+		opacity: 0,
+		overflow: "hidden",
+
+		transition: {
+			duration: 0.2,
+		},
+	},
+};
+
 interface State {
 	id: string;
-	show: boolean;
+	showToken: boolean;
 	error: null | { field: string; message: string };
+	showInputs: boolean;
 }
 
 type Action =
@@ -59,7 +94,7 @@ type Action =
 			payload: string;
 	  }
 	| {
-			type: "toggle_store" | "toggle_show" | "clear_error";
+			type: "toggle_store" | "toggle_show_token" | "clear_error" | "toggle_open_inputs";
 	  }
 	| {
 			type: "set_error";
@@ -68,6 +103,13 @@ type Action =
 
 const reducer = (state: State, action: Action): State => {
 	switch (action.type) {
+		case "toggle_open_inputs": {
+			return {
+				...state,
+				showInputs: !state.showInputs,
+			};
+		}
+
 		case "set_id": {
 			return {
 				...state,
@@ -75,10 +117,10 @@ const reducer = (state: State, action: Action): State => {
 			};
 		}
 
-		case "toggle_show":
+		case "toggle_show_token":
 			return {
 				...state,
-				show: !state.show,
+				showToken: !state.showToken,
 			};
 
 		case "set_error":
@@ -102,8 +144,9 @@ const reducer = (state: State, action: Action): State => {
 const Landing: FC = () => {
 	const [state, dispatch] = useReducer(reducer, {
 		id: getId(),
-		show: false,
+		showToken: false,
 		error: null,
+		showInputs: false,
 	});
 
 	const context = useAppContext();
@@ -129,58 +172,73 @@ const Landing: FC = () => {
 	}, [state.id]);
 
 	return (
-		<Wrapper>
-			<form action="" onSubmit={(e) => e.preventDefault()}>
-				<InputGroup>
-					<InputTitle htmlFor="discord-id">Discord Id:</InputTitle>
-					<DataInput
-						id="discord-id"
-						name="discord-id"
-						autoComplete="discord-id"
-						type="text"
-						value={state.id}
-						onChange={(e) => dispatch({ type: "set_id", payload: e.target.value })}
-					/>
-					{state.error && state.error.field === "id" && <ErrorText>Error: {state.error.message}</ErrorText>}
-				</InputGroup>
-				<InputGroup>
-					<InputTitle htmlFor="lanyard-token">Lanyard api token:</InputTitle>
-					<DataInput
-						id="lanyard-token"
-						name="lanyard-token"
-						type={state.show ? "text" : "password"}
-						autoComplete="lanyard-token"
-						value={context.token ?? ""}
-						onChange={(e) => context.setToken(e.target.value)}
-					/>
-					{state.error && state.error.field === "token" && (
-						<ErrorText>Error: {state.error.message}</ErrorText>
-					)}
-				</InputGroup>
-				<InputGroup>
-					<CheckboxSpan>
-						<label htmlFor="show-token">Show token:</label>
-						<Checkbox
-							id="show-token"
-							name="show-token"
-							type="checkbox"
-							checked={state.show}
-							onChange={() => dispatch({ type: "toggle_show" })}
-						/>
-					</CheckboxSpan>
-					<CheckboxSpan>
-						<label htmlFor="store-token">Keep token stored:</label>
-						<Checkbox
-							id="store-token"
-							name="store-token"
-							type="checkbox"
-							checked={context.store}
-							onChange={() => context.toggleStore()}
-						/>
-					</CheckboxSpan>
-				</InputGroup>
-			</form>
-		</Wrapper>
+		<AnimatePresence initial={false}>
+			<DataButton onClick={() => dispatch({ type: "toggle_open_inputs" })} key="bruh">
+				{state.showInputs ? "Hide Inputs" : "Show Inputs"}
+			</DataButton>
+			{state.showInputs && (
+				<AniamtedWrapper
+					variants={WrapperVariants}
+					initial="collapsed"
+					animate="initial"
+					exit="collapsed"
+					key="data-inputs"
+				>
+					<form action="" onSubmit={(e) => e.preventDefault()}>
+						<InputGroup>
+							<InputTitle htmlFor="discord-id">Discord Id:</InputTitle>
+							<DataInput
+								id="discord-id"
+								name="discord-id"
+								autoComplete="discord-id"
+								type="text"
+								value={state.id}
+								onChange={(e) => dispatch({ type: "set_id", payload: e.target.value })}
+							/>
+							{state.error && state.error.field === "id" && (
+								<ErrorText>Error: {state.error.message}</ErrorText>
+							)}
+						</InputGroup>
+						<InputGroup>
+							<InputTitle htmlFor="lanyard-token">Lanyard api token:</InputTitle>
+							<DataInput
+								id="lanyard-token"
+								name="lanyard-token"
+								type={state.showToken ? "text" : "password"}
+								autoComplete="lanyard-token"
+								value={context.token ?? ""}
+								onChange={(e) => context.setToken(e.target.value)}
+							/>
+							{state.error && state.error.field === "token" && (
+								<ErrorText>Error: {state.error.message}</ErrorText>
+							)}
+						</InputGroup>
+						<InputGroup>
+							<CheckboxSpan>
+								<label htmlFor="show-token">Show token:</label>
+								<Checkbox
+									id="show-token"
+									name="show-token"
+									type="checkbox"
+									checked={state.showToken}
+									onChange={() => dispatch({ type: "toggle_show_token" })}
+								/>
+							</CheckboxSpan>
+							<CheckboxSpan>
+								<label htmlFor="store-token">Keep token stored:</label>
+								<Checkbox
+									id="store-token"
+									name="store-token"
+									type="checkbox"
+									checked={context.store}
+									onChange={() => context.toggleStore()}
+								/>
+							</CheckboxSpan>
+						</InputGroup>
+					</form>
+				</AniamtedWrapper>
+			)}
+		</AnimatePresence>
 	);
 };
 export default Landing;

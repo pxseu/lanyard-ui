@@ -3,35 +3,33 @@ import { useFetchCached } from "hooks/fetchCached";
 import { useAppContext } from "hooks/useContexts";
 import { FC } from "react";
 import styled from "styled-components";
-import { BANNER_PATH } from "utils/consts";
+import { ADD_MEDIA_URL } from "utils/consts";
 import { colorFromStatus } from "utils/status";
 import { resolveAvatar } from "../../utils/avatar";
 
 const UserWrapper = styled(Wrapper)`
 	border-radius: 10px;
 	overflow: hidden;
-	justify-content: center;
 	display: flex;
+	justify-content: center;
 	flex-direction: column;
 	align-items: center;
 	padding: 10px;
 `;
 
-const AvatarWrapper = styled.div`
+const AvatarWrapper = styled.div<{ isBanner: boolean }>`
 	position: relative;
-	width: 160px;
-	height: 160px;
-	margin-bottom: 10px;
+	width: 210px;
+	height: 210px;
+	${({ isBanner }) => (isBanner ? "margin-top: 80px;" : "margin-top: 10px;")}
 `;
 
 const Banner = styled.img<{ show: boolean }>`
 	position: absolute;
 	top: 0;
 	left: 0;
-	right: 0;
-	bottom: 0;
 	width: 100%;
-	height: 100%;
+	height: 55%;
 	object-fit: cover;
 	${({ show }) => !show && "display: none;"};
 	pointer-events: none;
@@ -39,6 +37,7 @@ const Banner = styled.img<{ show: boolean }>`
 `;
 
 const Avatar = styled(Banner)`
+	height: 100%;
 	border-radius: 50%;
 	z-index: 2;
 	padding: 5px;
@@ -46,6 +45,7 @@ const Avatar = styled(Banner)`
 `;
 
 const TextWrapper = styled.div`
+	margin-top: 10px;
 	width: 90%;
 	z-index: 2;
 	display: flex;
@@ -70,19 +70,19 @@ const Discriminator = styled.span`
 	color: ${({ theme }) => theme.colors.primary}aa;
 `;
 
-const Id = styled(Username)`
-	font-size: 1em;
-	color: ${({ theme }) => theme.colors.primary}aa;
-`;
+// const Id = styled(Username)`
+// 	font-size: 1em;
+// 	color: ${({ theme }) => theme.colors.primary}aa;
+// `;
 
 const Status = styled.div<{ color: string }>`
 	position: absolute;
-	bottom: 9px;
-	right: 16px;
-	width: 27px;
-	height: 27px;
+	bottom: 12px;
+	right: 22px;
+	width: 32px;
+	height: 32px;
 	border-radius: 50%;
-	background-color: ${({ color }) => color};
+	background-color: ${({ color }) => colorFromStatus(color)};
 	border: 5px solid ${({ theme }) => theme.colors.presance};
 	z-index: 2;
 `;
@@ -90,16 +90,16 @@ const Status = styled.div<{ color: string }>`
 const User: FC = () => {
 	const state = useAppContext();
 	const avatar = useFetchCached(resolveAvatar(state?.presance?.discord_user));
-	const banner = useFetchCached(`${BANNER_PATH}/${state.presance?.discord_user.id}?size=2048`);
+	const banner = useFetchCached(`${ADD_MEDIA_URL}/banners/${state.presance?.discord_user.id}?size=512`);
 
 	if (!state.presance) return null;
 
 	return (
 		<UserWrapper>
 			<Banner show={!!banner} src={banner} alt="User banner" />
-			<AvatarWrapper title={state.presance.discord_status}>
+			<AvatarWrapper title={state.presance.discord_status} isBanner={!!banner}>
 				<Avatar show={!!avatar} src={avatar} alt="User avatar" />
-				<Status color={colorFromStatus(state.presance.discord_status)} />
+				<Status color={state.presance.discord_status} />
 			</AvatarWrapper>
 			<TextWrapper>
 				<Username
@@ -109,9 +109,9 @@ const User: FC = () => {
 					<Discriminator>#{state.presance.discord_user.discriminator}</Discriminator>
 				</Username>
 			</TextWrapper>
-			<TextWrapper>
+			{/* <TextWrapper>
 				<Id title={state.presance.discord_user.id}>{state.presance.discord_user.id}</Id>
-			</TextWrapper>
+			</TextWrapper> */}
 		</UserWrapper>
 	);
 };

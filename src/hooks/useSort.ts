@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { SORT_KEY } from "utils/consts";
 
-type SortTypes = "asc" | "desc";
+type SortTypes = "asc" | "desc" | null;
 
 interface Required {
 	0: string;
@@ -16,24 +16,24 @@ const sortFunc = (arr: Required[], sort: SortTypes) => {
 };
 
 export const useSort = () => {
-	const [sort, setSort] = useState<SortTypes>("desc");
-	const sorter = <T extends Required[]>(arr: T) => sortFunc(arr, sort) as T;
+	const [type, setType] = useState<SortTypes>(null);
+	const sorter = <T extends Required[]>(arr: T) => sortFunc(arr, type) as T;
 
 	const toggleSort = () => {
-		if (sort === "desc") return setSort("asc");
+		if (type === "desc") return setType("asc");
 
-		return setSort("desc");
+		return setType("desc");
 	};
 
 	useEffect(() => {
 		const stored = localStorage.getItem(SORT_KEY);
 
-		return setSort(stored as SortTypes);
+		return setType((stored ?? "desc") as SortTypes);
 	}, []);
 
 	useEffect(() => {
-		localStorage.setItem(SORT_KEY, String(sort));
-	}, [sort]);
+		localStorage.setItem(SORT_KEY, String(type));
+	}, [type]);
 
-	return { sorter, sort, toggleSort } as const;
+	return { sorter, type, toggleSort } as const;
 };

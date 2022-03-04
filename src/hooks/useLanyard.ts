@@ -169,6 +169,8 @@ export const useLanyard = () => {
 		try {
 			const res = await fetch(`${LANYARD_BASE_URL}/users/${user}`);
 			if (!res.ok) throw new Error(Errors.notFound);
+
+			// dispatch the presance via an async action
 			res.json().then(({ data }) => dispatch({ type: Events.presance, payload: data }));
 		} catch (error) {
 			throw error;
@@ -272,7 +274,7 @@ export const useLanyard = () => {
 			}
 
 			if (awaiting.current.length) {
-				for (const resolve of awaiting.current) resolve(null);
+				for (const resolve of awaiting.current) resolve(void null);
 				awaiting.current = [];
 			}
 

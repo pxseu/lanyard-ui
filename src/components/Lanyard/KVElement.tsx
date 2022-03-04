@@ -1,4 +1,4 @@
-import { FC, useEffect, useReducer, useRef } from "react";
+import { FC, memo, useEffect, useReducer, useRef } from "react";
 import styled from "styled-components";
 import { FaRegCheckCircle, FaTrash, FaUndo } from "react-icons/fa";
 import { ElementWrapper, ErrorText, Input, MotionButton, TextArea } from "components/Common";
@@ -189,6 +189,8 @@ const reducer = (state: State, action: Action): State => {
 			};
 
 		case "edit_reset":
+			if (!state.editing) return state;
+
 			return {
 				...state,
 				key: state.initialKey,
@@ -197,6 +199,8 @@ const reducer = (state: State, action: Action): State => {
 			};
 
 		case "edit_done": {
+			if (!state.editing) return state;
+
 			return {
 				...state,
 				editing: true,
@@ -357,9 +361,9 @@ const KVElement: FC<KVElementProps> = ({ data, ...props }) => {
 		}
 	};
 
-	const editingDone = () => state.editing && dispatch({ type: "edit_done" });
+	const editingDone = () => dispatch({ type: "edit_done" });
 	const deleteValue = () => dispatch({ type: "delete" });
-	const reset = () => state.editing && dispatch({ type: "edit_reset" });
+	const reset = () => dispatch({ type: "edit_reset" });
 
 	return (
 		<ElementWrapper
@@ -454,4 +458,4 @@ const KVElement: FC<KVElementProps> = ({ data, ...props }) => {
 	);
 };
 
-export default KVElement;
+export default memo(KVElement);

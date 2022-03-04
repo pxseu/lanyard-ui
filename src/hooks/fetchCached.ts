@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { DEFAULT_AVATAR_PATH, BANNER_PATH, PLACEHOLDER_PRESANCE } from "utils/consts";
+import { DEFAULT_AVATAR_PATH, ADD_MEDIA_URL, PLACEHOLDER_PRESANCE } from "utils/consts";
 
 const fetchUrl = async (url: string) => {
 	const response = await fetch(url);
@@ -23,7 +23,7 @@ export const useFetchCached = (url: string | null): string | undefined => {
 		};
 
 		if (!url) return setOldUrl(url);
-		if (url.startsWith(`${BANNER_PATH}/${PLACEHOLDER_PRESANCE.discord_user.id}`)) return setData(undefined);
+		if (url.startsWith(`${ADD_MEDIA_URL}/${PLACEHOLDER_PRESANCE.discord_user.id}`)) return setData(undefined);
 		if (url.startsWith(DEFAULT_AVATAR_PATH)) return setDataWithUrl(url);
 
 		setData(undefined);

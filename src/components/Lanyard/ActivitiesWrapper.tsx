@@ -12,7 +12,7 @@ const DEFAULT_ACTIVITY = {
 	assets: {},
 	timestamps: {},
 	application_id: "",
-	name: "Not doing anythin",
+	name: "Not doing anything",
 	details: "",
 	created_at: Date.now(),
 };

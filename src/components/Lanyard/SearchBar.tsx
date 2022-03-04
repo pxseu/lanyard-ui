@@ -45,25 +45,23 @@ const IconVariants: Variants = {
 	},
 };
 
-const SearchBar: FC<SearchBarProps> = ({ sort, onSearch }) => {
-	return (
-		<ElementWrapper>
-			<Input placeholder="Search" onChange={(e) => onSearch(e.target.value)} />
-			<SortButton onClick={sort.toggleSort}>
-				<AnimatePresence exitBeforeEnter initial={false}>
-					{sort.sort === "asc" ? (
-						<IconWrapper key="asc" variants={IconVariants} initial="initial" animate="animate" exit="exit">
-							<AiOutlineSortAscending fontSize={20} />
-						</IconWrapper>
-					) : (
-						<IconWrapper key="desc" variants={IconVariants} initial="initial" animate="animate" exit="exit">
-							<AiOutlineSortDescending fontSize={20} />
-						</IconWrapper>
-					)}
-				</AnimatePresence>
-			</SortButton>
-		</ElementWrapper>
-	);
-};
+const SearchBar: FC<SearchBarProps> = ({ sort, onSearch }) => (
+	<ElementWrapper>
+		<Input placeholder="Search" onChange={(e) => onSearch(e.target.value)} />
+		<SortButton onClick={() => sort.toggleSort()}>
+			<AnimatePresence exitBeforeEnter initial={false}>
+				{sort.type === "asc" ? (
+					<IconWrapper key="asc" variants={IconVariants} initial="initial" animate="animate" exit="exit">
+						<AiOutlineSortAscending fontSize={20} />
+					</IconWrapper>
+				) : (
+					<IconWrapper key="desc" variants={IconVariants} initial="initial" animate="animate" exit="exit">
+						<AiOutlineSortDescending fontSize={20} />
+					</IconWrapper>
+				)}
+			</AnimatePresence>
+		</SortButton>
+	</ElementWrapper>
+);
 
 export default SearchBar;

@@ -13,8 +13,8 @@ const KVWrapper = styled(Wrapper)`
 `;
 
 const KV_ANIMATION_VARIANTS: Variants = {
-	animate: { opacity: 1, height: "auto", paddingTop: "", paddingBottom: "", marginTop: "", marginBottom: "" },
-	initial: { opacity: 0.2, height: 0, paddingTop: 0, paddingBottom: 0, marginTop: 0, marginBottom: 0 },
+	animate: { opacity: 1, height: "auto", marginTop: "5px", marginBottom: "5px", padding: "10px 14px" },
+	initial: { opacity: 0, height: 0, marginTop: 0, marginBottom: 0, padding: "0 14px" },
 };
 
 const KV: FC = () => {
@@ -27,7 +27,13 @@ const KV: FC = () => {
 	const kv = Object.entries(context.presance?.kv);
 
 	const sorted = sorthook.sorter(kv);
-	const filtered = !filter ? sorted : sorted.filter(([key, value]) => key.includes(filter) || value.includes(filter));
+	const filtered = !filter
+		? sorted
+		: sorted.filter(
+				([key, value]) =>
+					key.toLowerCase().includes(filter.toLowerCase()) ||
+					value.toLowerCase().includes(filter.toLowerCase()),
+		  );
 
 	return (
 		<KVWrapper>
@@ -40,7 +46,7 @@ const KV: FC = () => {
 			<AnimatePresence initial={false}>
 				{filtered.map((data) => (
 					<KVElement
-						key={data[0]}
+						key={`${context.presance?.discord_user.id ?? "0"}-${data[0]}`}
 						data={data}
 						initial="initial"
 						animate="animate"

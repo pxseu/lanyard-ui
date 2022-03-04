@@ -2,7 +2,7 @@ import { Anchor, Wrapper } from "components/Common";
 import { useFetchCached } from "hooks/fetchCached";
 import { useTime } from "hooks/useTime";
 import { Activity as ActivityType } from "lanyard";
-import React, { FC } from "react";
+import React, { FC, memo } from "react";
 import styled from "styled-components";
 import { stringFromType } from "utils/activity";
 import { resolveActivity } from "utils/asset";
@@ -173,4 +173,4 @@ const Activity: FC<ActivityProps> = ({ activity, focused }) => {
 	);
 };
 
-export default Activity;
+export default memo(Activity);

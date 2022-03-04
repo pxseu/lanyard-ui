@@ -1,5 +1,5 @@
 import { Activity, Emoji } from "lanyard";
-import { PLACEHOLDER, UNKNOWN_ALBUM } from "./consts";
+import { ADD_MEDIA_URL, PLACEHOLDER, UNKNOWN_ALBUM } from "./consts";
 
 const resolveAsset = (applicationId?: string, asset?: string) => {
 	const split = asset?.split(":") || [];
@@ -18,7 +18,7 @@ const resolveAsset = (applicationId?: string, asset?: string) => {
 		return `https://media.discordapp.net/${split[1]}`;
 	}
 
-	if (applicationId && !asset) return `https://dcdn.dstn.to/app-icons/${applicationId}.webp?size=512`;
+	if (applicationId && !asset) return `${ADD_MEDIA_URL}/app-icons/${applicationId}.webp?size=512`;
 
 	// if no asset is provided return default image
 	if (!applicationId || !asset) return PLACEHOLDER;

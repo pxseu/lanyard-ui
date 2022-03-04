@@ -7,6 +7,6 @@ export const colorFromStatus = (status: string): string => {
 		case "dnd":
 			return "#e34a4d";
 		default:
-			return "grey";
+			return "#808080";
 	}
 };
