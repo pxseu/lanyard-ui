@@ -1,7 +1,7 @@
 import { Wrapper } from "components/Common";
 import { useFetchCached } from "hooks/fetchCached";
 import { useAppContext } from "hooks/useContexts";
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
 import styled from "styled-components";
 import { ADD_MEDIA_URL } from "utils/consts";
 import { colorFromStatus } from "utils/status";
@@ -120,7 +120,8 @@ const User: FC = () => {
 			<AvatarWrapper title={state.presance.discord_status} isBanner={!!banner}>
 				<Avatar show={!!avatar} src={avatar} alt="User avatar" />
 				<Status color={state.presance.discord_status} />
-				{decoration && decorationHover && (
+				{/* state issue resolved 💯💯💯💯 */}
+				{state.presance.discord_user.avatar_decoration_data && decoration && decorationHover && (
 					<DecorationImage
 						src={decoration}
 						alt="User decoration"
@@ -142,8 +143,9 @@ const User: FC = () => {
 					</Username>
 				) : (
 					<>
-						<Username>{state.presance.discord_user.username}</Username>
-						<GlobalName>{state.presance.discord_user.global_name}</GlobalName>
+						{/* it indeed is the other way around but i dont care to hcange the names of jsx elements */}
+						<Username>{state.presance.discord_user.global_name}</Username>
+						<GlobalName>{state.presance.discord_user.username}</GlobalName>
 					</>
 				)}
 			</TextWrapper>
