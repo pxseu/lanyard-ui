@@ -14,3 +14,8 @@ export const resolveAvatar = (user?: DiscordUser) => {
 	// use a webp image
 	return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.webp?size=512`;
 };
+
+export const resolveDecoration = (hovering: boolean, user?: DiscordUser) => {
+	if (!user || !user.avatar_decoration_data) return null;
+	return `https://cdn.discordapp.com/avatar-decoration-presets/${user.avatar_decoration_data.asset}?passthrough=${hovering}&size=512`;
+};

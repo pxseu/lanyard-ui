@@ -47,10 +47,17 @@ declare module "lanyard" {
 
 	export interface DiscordUser {
 		username: string;
+		global_name: string;
+		display_name: string;
 		public_flags: number;
 		id: string;
 		discriminator: string;
 		avatar: string | null;
+		avatar_decoration_data: {
+			asset: string;
+			sku_id: string;
+		} | null;
+		public_flags: number;
 	}
 
 	export interface Activity {

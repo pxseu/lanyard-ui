@@ -1,11 +1,11 @@
 import { Wrapper } from "components/Common";
 import { useFetchCached } from "hooks/fetchCached";
 import { useAppContext } from "hooks/useContexts";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import styled from "styled-components";
 import { ADD_MEDIA_URL } from "utils/consts";
 import { colorFromStatus } from "utils/status";
-import { resolveAvatar } from "../../utils/avatar";
+import { resolveAvatar, resolveDecoration } from "../../utils/avatar";
 
 const UserWrapper = styled(Wrapper)`
 	border-radius: 10px;
@@ -51,19 +51,23 @@ const TextWrapper = styled.div`
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	flex-direction: column;
+	margin-bottom: 5px;
 `;
 
 const Username = styled.p`
 	max-width: 100%;
 	display: inline-block;
 	font-size: 2em;
-	margin-bottom: 5px;
 	background-color: ${({ theme }) => theme.colors.presance}50;
-	padding: 2px 5px;
-	border-radius: 5px;
 	flex-shrink: 1;
 	word-wrap: break-word;
 	text-align: center;
+`;
+
+const GlobalName = styled(Username)`
+	display: block;
+	font-size: 1.2em;
 `;
 
 const Discriminator = styled.span`
@@ -84,13 +88,29 @@ const Status = styled.div<{ color: string }>`
 	border-radius: 50%;
 	background-color: ${({ color }) => colorFromStatus(color)};
 	border: 5px solid ${({ theme }) => theme.colors.presance};
-	z-index: 2;
+	z-index: 4;
+`;
+
+const DecorationImage = styled.img`
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 105%;
+	height: 105%;
+	z-index: 3;
+
+	::before {
+		content: "";
+	}
 `;
 
 const User: FC = () => {
 	const state = useAppContext();
 	const avatar = useFetchCached(resolveAvatar(state?.presance?.discord_user));
 	const banner = useFetchCached(`${ADD_MEDIA_URL}/banners/${state.presance?.discord_user.id}?size=512`);
+	const decorationHover = useFetchCached(resolveDecoration(true, state?.presance?.discord_user));
+	const decoration = useFetchCached(resolveDecoration(false, state?.presance?.discord_user));
 
 	if (!state.presance) return null;
 
@@ -100,14 +120,32 @@ const User: FC = () => {
 			<AvatarWrapper title={state.presance.discord_status} isBanner={!!banner}>
 				<Avatar show={!!avatar} src={avatar} alt="User avatar" />
 				<Status color={state.presance.discord_status} />
+				{decoration && decorationHover && (
+					<DecorationImage
+						src={decoration}
+						alt="User decoration"
+						// hacky but works :)
+						onMouseEnter={(e) => {
+							e.currentTarget.src = decorationHover;
+						}}
+						onMouseLeave={(e) => {
+							e.currentTarget.src = decoration;
+						}}
+					/>
+				)}
 			</AvatarWrapper>
 			<TextWrapper>
-				<Username
-					title={`${state.presance.discord_user.username}#${state.presance.discord_user.discriminator}`}
-				>
-					{state.presance.discord_user.username}
-					<Discriminator>#{state.presance.discord_user.discriminator}</Discriminator>
-				</Username>
+				{state.presance.discord_user.discriminator !== "0" ? (
+					<Username>
+						{state.presance.discord_user.username}
+						<Discriminator>#{state.presance.discord_user.discriminator}</Discriminator>
+					</Username>
+				) : (
+					<>
+						<Username>{state.presance.discord_user.username}</Username>
+						<GlobalName>{state.presance.discord_user.global_name}</GlobalName>
+					</>
+				)}
 			</TextWrapper>
 			{/* <TextWrapper>
 				<Id title={state.presance.discord_user.id}>{state.presance.discord_user.id}</Id>
