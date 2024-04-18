@@ -41,11 +41,11 @@ const App: FC = () => {
 				<Helmet>
 					{lanyard.presance ? (
 						<title>
-							Checking User: {lanyard.presance.discord_user.username}
-							{lanyard.presance.discord_user.discriminator !== "0" && (
-								<>#{lanyard.presance.discord_user.discriminator}</>
-							)}
-							{/* ({lanyard.presance.discord_user.id}) */}
+							{`Checking User: ${lanyard.presance.discord_user.username}${
+								lanyard.presance.discord_user.discriminator !== "0"
+									? `#${lanyard.presance.discord_user.discriminator}`
+									: ""
+							}`}
 						</title>
 					) : (
 						<title>Lanyard UI</title>
