@@ -6,6 +6,7 @@ import styled from "styled-components";
 import { ADD_MEDIA_URL } from "utils/consts";
 import { colorFromStatus } from "utils/status";
 import { resolveAvatar, resolveDecoration } from "../../utils/avatar";
+import Clan from "./Clan";
 
 const UserWrapper = styled(Wrapper)`
 	border-radius: 10px;
@@ -148,6 +149,8 @@ const User: FC = () => {
 						<GlobalName>{state.presance.discord_user.username}</GlobalName>
 					</>
 				)}
+
+				<Clan clan={state.presance.discord_user.clan} />
 			</TextWrapper>
 			{/* <TextWrapper>
 				<Id title={state.presance.discord_user.id}>{state.presance.discord_user.id}</Id>

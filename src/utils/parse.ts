@@ -1,11 +1,27 @@
 import pako from "pako";
 
 export const parse = <T>(data: ArrayBuffer): T => {
-	if (typeof data === "string") return JSON.parse(data);
+	const decompressed = typeof data === "string" ? data : pako.inflate(new Uint8Array(data), { to: "string" });
 
-	const decompressed = pako.inflate(new Uint8Array(data), { to: "string" });
+	return JSON.parse(decompressed, (key, value) => {
+		console.log(key, value, typeof value);
 
-	return JSON.parse(decompressed);
+		if (typeof value !== "number" || Number.MAX_SAFE_INTEGER > value) {
+			return value;
+		}
+
+		const maxLen = Number.MAX_SAFE_INTEGER.toString().length - 1;
+		const needle = String(value).slice(0, maxLen);
+
+		const re = new RegExp(`${needle}\\d+`);
+		const matches = decompressed.match(re);
+
+		if (matches) {
+			return String(matches[0]);
+		}
+
+		return value;
+	});
 };
 
 export const stringify = (data: any) => {

@@ -58,6 +58,13 @@ declare module "lanyard" {
 			sku_id: string;
 		} | null;
 		public_flags: number;
+		clan: {
+			tag: string;
+			badge: string;
+			/// idfk what this is
+			identity_enabled: boolean;
+			identity_guild_id: string;
+		} | null;
 	}
 
 	export interface Activity {

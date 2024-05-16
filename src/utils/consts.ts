@@ -37,6 +37,7 @@ export const PLACEHOLDER_PRESANCE = {
 		public_flags: 0,
 		global_name: "global_name",
 		display_name: "display_name",
+		clan: null,
 		avatar_decoration_data: null,
 	},
 	activities: [],
