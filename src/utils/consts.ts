@@ -14,6 +14,7 @@ export const PLACEHOLDER = "/assets/placeholder.svg" as const;
 export const UNKNOWN_ALBUM = "/assets/album.svg" as const;
 export const ADD_MEDIA_URL = "https://dcdn.dstn.to" as const;
 export const DEFAULT_AVATAR_PATH = "https://cdn.discordapp.com/embed/avatars";
+export const TWEMOJI_CDN = "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg" as const;
 export const DEFAULT_ID_VALUE = "819287687121993768" as const;
 export const USER_REGEX = /^\d{17,}$/;
 export const KEY_REGEX = /^[a-z\d_]+$/i;
@@ -39,9 +40,12 @@ export const PLACEHOLDER_PRESANCE = {
 		display_name: "display_name",
 		clan: null,
 		avatar_decoration_data: null,
+		primary_guild: null,
+		collectibles: {},
 	},
 	activities: [],
 	spotify: null,
 	discord_status: "offline",
 	listening_to_spotify: false,
-} as Presence;
+	
+} satisfies Presence;

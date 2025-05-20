@@ -1,5 +1,5 @@
 import { Activity, Emoji } from "lanyard";
-import { ADD_MEDIA_URL, PLACEHOLDER, UNKNOWN_ALBUM } from "@/utils/consts";
+import { ADD_MEDIA_URL, PLACEHOLDER, UNKNOWN_ALBUM, TWEMOJI_CDN } from "@/utils/consts";
 
 const resolveAsset = (applicationId?: string, asset?: string) => {
 	const split = asset?.split(":") || [];
@@ -30,7 +30,7 @@ const resolveAsset = (applicationId?: string, asset?: string) => {
 const resolveEmoji = (emoji: Emoji) => {
 	// if emoji doesnt have id fallback to twemoji to resolve
 	if (!emoji.id)
-		return `https://twemoji.maxcdn.com/v/13.1.0/svg/${Array.from(emoji.name)
+		return `${TWEMOJI_CDN}/${Array.from(emoji.name)
 			.map((em) => em.codePointAt(0)?.toString(16))
 			.join("-")}.svg`;
 	// if emoji is not animated use png

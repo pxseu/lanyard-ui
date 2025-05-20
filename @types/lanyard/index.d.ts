@@ -45,6 +45,20 @@ declare module "lanyard" {
 		active_on_discord_desktop: boolean;
 	}
 
+	export type Clan = {
+		tag: string;
+		badge: string;
+		identity_enabled: boolean;
+		identity_guild_id: string;
+	} | null;
+
+	export interface Collectible {
+		asset: string;
+		expires_at: number | null;
+		label: string;
+		palette: string;
+		sku_id: string;
+	}
 	export interface DiscordUser {
 		username: string;
 		global_name: string;
@@ -58,13 +72,9 @@ declare module "lanyard" {
 			sku_id: string;
 		} | null;
 		public_flags: number;
-		clan: {
-			tag: string;
-			badge: string;
-			/// idfk what this is
-			identity_enabled: boolean;
-			identity_guild_id: string;
-		} | null;
+		clan: Clan;
+		primary_guild: Clan;
+		collectibles: Record<string, Collectible>;
 	}
 
 	export interface Activity {
