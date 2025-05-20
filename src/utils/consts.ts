@@ -47,5 +47,4 @@ export const PLACEHOLDER_PRESANCE = {
 	spotify: null,
 	discord_status: "offline",
 	listening_to_spotify: false,
-	
 } satisfies Presence;

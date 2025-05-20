@@ -20,9 +20,7 @@ export const useSort = () => {
 	const sorter = <T extends Required[]>(arr: T) => sortFunc(arr, type) as T;
 
 	const toggleSort = () => {
-		if (type === "desc") return setType("asc");
-
-		return setType("desc");
+		return setType((type) => (type === "desc" ? "asc" : "desc"));
 	};
 
 	useEffect(() => {
