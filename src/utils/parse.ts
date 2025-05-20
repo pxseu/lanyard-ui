@@ -1,10 +1,14 @@
 import pako from "pako";
+import { logger } from "./log";
+import { PRODUCTION } from "./consts";
+
+const log = logger("log", "parse", true);
 
 export const parse = <T>(data: ArrayBuffer): T => {
 	const decompressed = typeof data === "string" ? data : pako.inflate(new Uint8Array(data), { to: "string" });
 
 	return JSON.parse(decompressed, (key, value) => {
-		console.log(key, value, typeof value);
+		if (PRODUCTION) log(key, value, typeof value);
 
 		if (typeof value !== "number" || Number.MAX_SAFE_INTEGER > value) {
 			return value;
