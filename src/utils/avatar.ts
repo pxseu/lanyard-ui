@@ -1,11 +1,25 @@
 import { DiscordUser } from "lanyard";
 import { DEFAULT_AVATAR_PATH } from "./consts";
 
+const resolveDefaultAvatar = (user: DiscordUser) => {
+	let index;
+
+	if (user.discriminator !== "0") {
+		index = parseInt(user.discriminator) % 5;
+	} else {
+		const math = (BigInt(user.id) >> BigInt(22)) % BigInt(6);
+
+		index = Number(math);
+	}
+
+	return `${DEFAULT_AVATAR_PATH}/${index}.png`;
+};
+
 export const resolveAvatar = (user?: DiscordUser) => {
 	if (!user) return null;
 
 	// fallback to default avatar based on user's discriminator
-	if (!user.avatar) return `${DEFAULT_AVATAR_PATH}/${parseInt(user.discriminator) % 5}.png`;
+	if (!user.avatar) return resolveDefaultAvatar(user);
 
 	// if hash starts with a_ it's animated
 	if (user.avatar.startsWith("a_"))
