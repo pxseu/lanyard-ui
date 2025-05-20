@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { SORT_KEY } from "@/utils/consts";
 
 type SortTypes = "asc" | "desc" | null;
@@ -19,9 +19,9 @@ export const useSort = () => {
 	const [type, setType] = useState<SortTypes>(null);
 	const sorter = <T extends Required[]>(arr: T) => sortFunc(arr, type) as T;
 
-	const toggleSort = () => {
-		return setType((type) => (type === "desc" ? "asc" : "desc"));
-	};
+	const toggleSort = useCallback(() => {
+		setType((type) => (type === "desc" ? "asc" : "desc"));
+	}, [setType]);
 
 	useEffect(() => {
 		const stored = localStorage.getItem(SORT_KEY);
