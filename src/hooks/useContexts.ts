@@ -1,4 +1,4 @@
-import { AppContext } from "App";
+import { AppContext } from "@/App";
 import { useContext } from "react";
 
 export const useAppContext = () => {

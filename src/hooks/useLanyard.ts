@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/indent */
 import { useEffect, useReducer, useRef } from "react";
 import type { Presence, SocketMessageRecieve, SocketMessageSend } from "lanyard";
-import { logger } from "utils/log";
+import { logger } from "@/utils/log";
 import {
 	PRESANCE_KEY,
 	SOCKET_URL,
@@ -15,9 +14,9 @@ import {
 	MAX_RECONNECT_TIME,
 	KEY_MAX_LENGTH,
 	MAX_KEYS_AMMOUNT,
-} from "utils/consts";
-import { parse, stringify } from "utils/parse";
-import { getPresence, getToken } from "utils/getCached";
+} from "@/utils/consts";
+import { parse, stringify } from "@/utils/parse";
+import { getPresence, getToken } from "@/utils/getCached";
 
 enum Events {
 	presance = "presence",
@@ -140,10 +139,10 @@ export const useLanyard = () => {
 	});
 
 	const socket = useRef<WebSocket | null>(null);
-	const heartbeat = useRef<NodeJS.Timeout | null>(null);
+	const heartbeat = useRef<ReturnType<typeof setInterval> | null>(null);
 	const awaiting = useRef<((value: unknown) => void)[]>([]);
 	const subscribed = useRef<string | null>(null);
-	const reconnect = useRef<NodeJS.Timeout | null>(null);
+	const reconnect = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	const waitUntilConnected = () =>
 		new Promise((resolve) => {

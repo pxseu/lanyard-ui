@@ -1,3 +1,4 @@
+// @ts-ignore
 import { motion } from "framer-motion";
 import { FC } from "react";
 import styled, { DefaultTheme, StyledComponentProps } from "styled-components";

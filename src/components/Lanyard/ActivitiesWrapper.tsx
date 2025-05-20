@@ -1,6 +1,6 @@
-import React, { FC } from "react";
-import { useAppContext } from "hooks/useContexts";
-import { Wrapper } from "components/Common";
+import { FC } from "react";
+import { useAppContext } from "@/hooks/useContexts";
+import { Wrapper } from "@/components/Common";
 import Activity from "./Activity";
 import { Activity as ActivityType } from "lanyard";
 import styled from "styled-components";

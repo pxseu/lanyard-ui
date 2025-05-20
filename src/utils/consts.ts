@@ -1,11 +1,11 @@
-import { Presence } from "lanyard";
+import type { Presence } from "lanyard";
 
 const PREFIX_AND_VERSION = "lanyard:v1:" as const;
 
 export const RECONNECT_INTERVAL = 500;
 export const MAX_RECONNECT_TIME = 5_000;
 export const PRODUCTION =
-	process.env.REACT_APP_ENV?.toLowerCase() === "production" && localStorage.getItem("lanyard:debug") !== "true";
+	import.meta.env.REACT_APP_ENV?.toLowerCase() === "production" && localStorage.getItem("lanyard:debug") !== "true";
 export const KEY_ID = `${PREFIX_AND_VERSION}id` as const;
 export const KEY_TOKEN = `${PREFIX_AND_VERSION}token` as const;
 export const PRESANCE_KEY = `${PREFIX_AND_VERSION}last_presance` as const;

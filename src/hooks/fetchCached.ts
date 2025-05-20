@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { DEFAULT_AVATAR_PATH, ADD_MEDIA_URL, PLACEHOLDER_PRESANCE } from "utils/consts";
+import { DEFAULT_AVATAR_PATH, ADD_MEDIA_URL, PLACEHOLDER_PRESANCE } from "@/utils/consts";
 
 const fetchUrl = async (url: string) => {
 	const response = await fetch(url);

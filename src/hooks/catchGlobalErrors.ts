@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { logger } from "utils/log";
+import { logger } from "@/utils/log";
 
 const log = logger("info", "global_error_handler");
 

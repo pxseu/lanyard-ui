@@ -1,9 +1,9 @@
 import { StrictMode } from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import App from "./App";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
-import theme from "utils/theme";
-import ErrorBoundary from "components/Boundary";
+import theme from "@/utils/theme";
+import ErrorBoundary from "@/components/Boundary";
 
 const Global = createGlobalStyle`
 	*, *:before, *:after {
@@ -51,15 +51,18 @@ const Global = createGlobalStyle`
 	}
 `;
 
-ReactDOM.render(
+const rootElement = document.getElementById("root");
+if (!rootElement) throw new Error("Failed to find the root element");
+
+const root = createRoot(rootElement);
+
+root.render(
 	<StrictMode>
 		<ThemeProvider theme={theme}>
 			<Global />
-
 			<ErrorBoundary>
 				<App />
 			</ErrorBoundary>
 		</ThemeProvider>
 	</StrictMode>,
-	document.getElementById("root"),
 );

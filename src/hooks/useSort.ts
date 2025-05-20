@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { SORT_KEY } from "utils/consts";
+import { SORT_KEY } from "@/utils/consts";
 
 type SortTypes = "asc" | "desc" | null;
 

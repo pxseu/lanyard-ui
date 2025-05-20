@@ -1,6 +1,6 @@
 import { FC } from "react";
 import styled from "styled-components";
-import { REPOSITORY_URL } from "utils/consts";
+import { REPOSITORY_URL } from "@/utils/consts";
 import Center from "./Center";
 import { Anchor, Button, Wrapper } from "./Common";
 import Credits from "./Credits";

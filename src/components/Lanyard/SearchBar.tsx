@@ -1,8 +1,9 @@
-import type { useSort } from "hooks/useSort";
-import { Button, ElementWrapper, Input } from "components/Common";
+import type { useSort } from "@/hooks/useSort";
+import { Button, ElementWrapper, Input } from "@/components/Common";
 import { FC } from "react";
 import styled from "styled-components";
 import { AiOutlineSortAscending, AiOutlineSortDescending } from "react-icons/ai";
+// @ts-ignore
 import { motion, AnimatePresence, Variants } from "framer-motion";
 
 interface SearchBarProps {

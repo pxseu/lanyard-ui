@@ -1,6 +1,6 @@
 import { FC } from "react";
 import styled from "styled-components";
-import { useTime } from "hooks/useTime";
+import { useTime } from "@/hooks/useTime";
 
 const Row = styled.div`
 	display: flex;

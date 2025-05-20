@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/indent */
+// @ts-ignore
 import { AnimatePresence, motion, Variants } from "framer-motion";
-import { useAppContext } from "hooks/useContexts";
+import { useAppContext } from "@/hooks/useContexts";
 import { FC, useEffect, useReducer } from "react";
 import styled from "styled-components";
-import { getId } from "utils/getCached";
+import { getId } from "@/utils/getCached";
 import { Button, ErrorText, Input, Wrapper } from "./Common";
 
 const InputTitle = styled.label`

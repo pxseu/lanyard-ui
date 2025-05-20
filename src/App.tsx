@@ -1,15 +1,15 @@
-import Loader from "components/Loader";
-import { useLanyard } from "hooks/useLanyard";
-import Inputs from "components/Data";
+import Loader from "@/components/Loader";
+import { useLanyard } from "@/hooks/useLanyard";
+import Inputs from "@/components/Data";
 import { createContext, FC, useEffect } from "react";
-import User from "components/Lanyard/User";
+import User from "@/components/Lanyard/User";
 import styled from "styled-components";
-import KV from "components/Lanyard/KV";
-import { logger } from "utils/log";
-import { PRODUCTION } from "utils/consts";
+import KV from "@/components/Lanyard/KV";
+import { logger } from "@/utils/log";
+import { PRODUCTION } from "@/utils/consts";
 import { Helmet, HelmetProvider } from "react-helmet-async";
-import Credits from "components/Credits";
-import Activities from "components/Lanyard/ActivitiesWrapper";
+import Credits from "@/components/Credits";
+import Activities from "@/components/Lanyard/ActivitiesWrapper";
 
 export const AppContext = createContext<ReturnType<typeof useLanyard> | null>(null);
 
@@ -29,7 +29,7 @@ const App: FC = () => {
 	const lanyard = useLanyard();
 
 	useEffect(() => {
-		log("NODE_ENV", process.env.NODE_ENV);
+		log("NODE_ENV", import.meta.env.NODE_ENV);
 		log("PRODUCTION", PRODUCTION);
 	}, []);
 

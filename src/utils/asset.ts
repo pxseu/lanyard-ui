@@ -1,5 +1,5 @@
 import { Activity, Emoji } from "lanyard";
-import { ADD_MEDIA_URL, PLACEHOLDER, UNKNOWN_ALBUM } from "./consts";
+import { ADD_MEDIA_URL, PLACEHOLDER, UNKNOWN_ALBUM } from "@/utils/consts";
 
 const resolveAsset = (applicationId?: string, asset?: string) => {
 	const split = asset?.split(":") || [];

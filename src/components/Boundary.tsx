@@ -1,6 +1,6 @@
-import { useCatchGlobalErrors } from "hooks/catchGlobalErrors";
-import React, { Component, ErrorInfo, FC, ReactNode } from "react";
-import { logger } from "utils/log";
+import { useCatchGlobalErrors } from "@/hooks/catchGlobalErrors";
+import { Component, ErrorInfo, FC, ReactNode } from "react";
+import { logger } from "@/utils/log";
 import ErrorPage from "./ErrorPage";
 
 interface Props {
@@ -35,7 +35,7 @@ class ErrorBoundaryClass extends Component<Props, State> {
 	}
 }
 
-const ErrorBoundary: FC = ({ children }) => {
+const ErrorBoundary: FC<Props> = ({ children }) => {
 	const globalError = useCatchGlobalErrors();
 
 	if (globalError) return <ErrorPage error={globalError} />;

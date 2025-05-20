@@ -1,11 +1,11 @@
-import { Anchor, Wrapper } from "components/Common";
-import { useFetchCached } from "hooks/fetchCached";
-import { useTime } from "hooks/useTime";
+import { Anchor, Wrapper } from "@/components/Common";
+import { useFetchCached } from "@/hooks/fetchCached";
+import { useTime } from "@/hooks/useTime";
 import { Activity as ActivityType } from "lanyard";
-import React, { FC, memo } from "react";
+import { FC, memo } from "react";
 import styled from "styled-components";
-import { stringFromType } from "utils/activity";
-import { resolveActivity } from "utils/asset";
+import { stringFromType } from "@/utils/activity";
+import { resolveActivity } from "@/utils/asset";
 import Progress from "./Progress";
 
 const ActivityWrapper = styled(Wrapper)`

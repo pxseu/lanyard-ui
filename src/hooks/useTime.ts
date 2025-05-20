@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/indent */
-
 import { Timestamps } from "lanyard";
 import { useEffect, useState } from "react";
 

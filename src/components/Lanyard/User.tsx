@@ -1,11 +1,11 @@
-import { Wrapper } from "components/Common";
-import { useFetchCached } from "hooks/fetchCached";
-import { useAppContext } from "hooks/useContexts";
+import { Wrapper } from "@/components/Common";
+import { useFetchCached } from "@/hooks/fetchCached";
+import { useAppContext } from "@/hooks/useContexts";
 import { FC } from "react";
 import styled from "styled-components";
-import { ADD_MEDIA_URL } from "utils/consts";
-import { colorFromStatus } from "utils/status";
-import { resolveAvatar, resolveDecoration } from "../../utils/avatar";
+import { ADD_MEDIA_URL } from "@/utils/consts";
+import { colorFromStatus } from "@/utils/status";
+import { resolveAvatar, resolveDecoration } from "@/utils/avatar";
 import Clan from "./Clan";
 
 const UserWrapper = styled(Wrapper)`

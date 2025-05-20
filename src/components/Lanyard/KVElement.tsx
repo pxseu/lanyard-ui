@@ -1,8 +1,9 @@
 import { FC, memo, useEffect, useReducer, useRef } from "react";
 import styled from "styled-components";
 import { FaRegCheckCircle, FaTrash, FaUndo } from "react-icons/fa";
-import { ElementWrapper, ErrorText, Input, MotionButton, TextArea } from "components/Common";
-import { useAppContext } from "hooks/useContexts";
+import { ElementWrapper, ErrorText, Input, MotionButton, TextArea } from "@/components/Common";
+import { useAppContext } from "@/hooks/useContexts";
+// @ts-ignore
 import { motion, AnimatePresence, Variants } from "framer-motion";
 
 const KVInputWrapper = styled.span`
@@ -314,7 +315,7 @@ const KVElement: FC<KVElementProps> = ({ data, ...props }) => {
 
 	useEffect(() => {
 		let mounted = true;
-		let timeout: NodeJS.Timeout | null = null;
+		let timeout: ReturnType<typeof setTimeout> | null = null;
 
 		const handleIn = () => {
 			dispatch({ type: "focus" });
@@ -388,7 +389,7 @@ const KVElement: FC<KVElementProps> = ({ data, ...props }) => {
 							{(state.editing || state.hover) && !!state.initialKey && !!state.initialValue && (
 								<KVButton
 									onClick={deleteValue}
-									onKeyDown={(e) => onKeyDown(e, deleteValue)}
+									onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => onKeyDown(e, deleteValue)}
 									hovercolors="#a53434"
 									transition={{ duration: 0.2 }}
 									variants={buttonVariants}
@@ -411,7 +412,7 @@ const KVElement: FC<KVElementProps> = ({ data, ...props }) => {
 						placeholder="value"
 						required={state.editing}
 						disabled={state.sending}
-						onKeyDown={(e) => onKeyDown(e, editingDone)}
+						onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => onKeyDown(e, editingDone)}
 					/>
 					<CenterCollumn>
 						<AnimatePresence>
@@ -419,7 +420,7 @@ const KVElement: FC<KVElementProps> = ({ data, ...props }) => {
 							{state.editing && (
 								<KVButton
 									onClick={reset}
-									onKeyDown={(e) => onKeyDown(e, reset)}
+									onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => onKeyDown(e, reset)}
 									hovercolors="#a59d34"
 									transition={{ duration: 0.2 }}
 									variants={buttonVariants}
@@ -436,7 +437,7 @@ const KVElement: FC<KVElementProps> = ({ data, ...props }) => {
 							{state.editing && (
 								<KVButton
 									onClick={editingDone}
-									onKeyDown={(e) => onKeyDown(e, editingDone)}
+									onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => onKeyDown(e, editingDone)}
 									hovercolors="#34a534"
 									transition={{ duration: 0.2 }}
 									variants={buttonVariants}

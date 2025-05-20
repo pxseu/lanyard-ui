@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import { AUTHOR_URL, REPOSITORY_URL } from "utils/consts";
-import { Anchor, Wrapper } from "./Common";
+import { AUTHOR_URL, REPOSITORY_URL } from "@/utils/consts";
+import { Anchor, Wrapper } from "@/components/Common";
 
 const Paragraph = styled.p`
 	text-align: center;

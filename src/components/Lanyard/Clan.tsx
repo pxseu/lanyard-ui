@@ -1,5 +1,4 @@
-// import { useFetchCached } from "hooks/fetchCached";
-import { useFetchCached } from "hooks/fetchCached";
+import { useFetchCached } from "@/hooks/fetchCached";
 import { DiscordUser } from "lanyard";
 import { FC } from "react";
 import styled from "styled-components";

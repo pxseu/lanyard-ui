@@ -1,10 +1,11 @@
-import { Wrapper } from "components/Common";
-import { useAppContext } from "hooks/useContexts";
+import { Wrapper } from "@/components/Common";
+import { useAppContext } from "@/hooks/useContexts";
 import { FC, useState } from "react";
 import styled from "styled-components";
 import KVElement from "./KVElement";
+// @ts-ignore
 import { AnimatePresence, Variants } from "framer-motion";
-import { useSort } from "hooks/useSort";
+import { useSort } from "@/hooks/useSort";
 import SearchBar from "./SearchBar";
 
 const KVWrapper = styled(Wrapper)`
