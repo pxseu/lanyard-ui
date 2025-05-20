@@ -7,6 +7,7 @@ import { ADD_MEDIA_URL } from "@/utils/consts";
 import { colorFromStatus } from "@/utils/status";
 import { resolveAvatar, resolveDecoration } from "@/utils/avatar";
 import Clan from "./Clan";
+import Badges from "./Badges";
 
 const UserWrapper = styled(Wrapper)`
 	border-radius: 10px;
@@ -121,12 +122,10 @@ const User: FC = () => {
 			<AvatarWrapper title={state.presance.discord_status} isBanner={!!banner}>
 				<Avatar show={!!avatar} src={avatar} alt="User avatar" />
 				<Status color={state.presance.discord_status} />
-				{/* state issue resolved 💯💯💯💯 */}
 				{state.presance.discord_user.avatar_decoration_data && decoration && decorationHover && (
 					<DecorationImage
 						src={decoration}
 						alt="User decoration"
-						// hacky but works :)
 						onMouseEnter={(e) => {
 							e.currentTarget.src = decorationHover;
 						}}
@@ -144,12 +143,11 @@ const User: FC = () => {
 					</Username>
 				) : (
 					<>
-						{/* it indeed is the other way around but i dont care to hcange the names of jsx elements */}
 						<Username>{state.presance.discord_user.global_name}</Username>
 						<GlobalName>{state.presance.discord_user.username}</GlobalName>
 					</>
 				)}
-
+				<Badges user={state.presance.discord_user} />
 				<Clan clan={state.presance.discord_user.clan} />
 			</TextWrapper>
 			{/* <TextWrapper>
