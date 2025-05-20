@@ -20,6 +20,7 @@
 		"styled-components": "^5.3.11"
 	},
 	"devDependencies": {
+		"@pxseu/prettier-config": "^1.0.0",
 		"@types/bun": "^1.2.13",
 		"@types/pako": "^1.0.7",
 		"@types/react": "^18.3.21",
