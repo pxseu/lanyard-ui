@@ -10,6 +10,7 @@ import { PRODUCTION } from "@/utils/consts";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import Credits from "@/components/Credits";
 import Activities from "@/components/Lanyard/ActivitiesWrapper";
+import LastSeen from "@/components/LastSeen";
 
 export const AppContext = createContext<ReturnType<typeof useLanyard> | null>(null);
 
@@ -54,6 +55,7 @@ const App: FC = () => {
 				<Postition>
 					<Inputs />
 					<User />
+					<LastSeen />
 					<Activities />
 					<KV />
 					<Credits />

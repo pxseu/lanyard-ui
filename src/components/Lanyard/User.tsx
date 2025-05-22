@@ -8,6 +8,8 @@ import { colorFromStatus } from "@/utils/status";
 import { resolveAvatar, resolveDecoration } from "@/utils/avatar";
 import Clan from "./Clan";
 import Badges from "./Badges";
+// @ts-ignore
+import { AnimatePresence, motion } from "framer-motion";
 
 const UserWrapper = styled(Wrapper)`
 	border-radius: 10px;
@@ -19,7 +21,7 @@ const UserWrapper = styled(Wrapper)`
 	padding: 10px;
 `;
 
-const AvatarWrapper = styled.div<{ isBanner: boolean }>`
+const AvatarWrapper = styled(motion.div)<{ isBanner: boolean }>`
 	position: relative;
 	width: 210px;
 	height: 210px;
@@ -33,9 +35,9 @@ const Banner = styled.img<{ show: boolean }>`
 	width: 100%;
 	height: 55%;
 	object-fit: cover;
-	${({ show }) => !show && "display: none;"};
 	pointer-events: none;
 	user-select: none;
+	${({ show }) => !show && "display: none;"}
 `;
 
 const Avatar = styled(Banner)`
