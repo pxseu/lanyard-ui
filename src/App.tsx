@@ -12,7 +12,9 @@ import Credits from "@/components/Credits";
 import Activities from "@/components/Lanyard/ActivitiesWrapper";
 import LastSeen from "@/components/LastSeen";
 
-export const AppContext = createContext<ReturnType<typeof useLanyard> | null>(null);
+export const AppContext = createContext<ReturnType<typeof useLanyard> | null>(
+	null,
+);
 
 const Postition = styled.div`
 	padding-top: 30px;
@@ -30,7 +32,7 @@ const App: FC = () => {
 	const lanyard = useLanyard();
 
 	useEffect(() => {
-		log("NODE_ENV", import.meta.env.NODE_ENV);
+		log("MODE", import.meta.env.MODE);
 		log("PRODUCTION", PRODUCTION);
 	}, []);
 
