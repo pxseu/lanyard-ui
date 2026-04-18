@@ -1,6 +1,6 @@
-import { FC } from "react";
+import type { CSSProperties } from "react";
 import styled from "styled-components";
-import { useTime } from "@/hooks/useTime";
+import type { useTime } from "@/hooks/useTime";
 
 const Row = styled.div`
 	display: flex;
@@ -36,16 +36,24 @@ const ProgressBar = styled.div<{ activity: number }>`
 `;
 
 const ProgressTime = styled.p`
-	/* TODO: find good fontsize */
-	font-size: 0.75em;
-	font-weight: normal;
+	font-size: 0.75rem;
 	margin: 0 5px;
 	color: ${({ theme }) => theme.colors.primary};
 	font-weight: normal;
 `;
 
-const Progress: FC<{ time: ReturnType<typeof useTime>; activity: number }> = ({ time, activity }) => {
-	if (!time || !time.completion) return null;
+const Progress = ({
+	time,
+	activity,
+}: {
+	time: ReturnType<typeof useTime>;
+	activity: number;
+}) => {
+	if (!time?.completion) return null;
+
+	const progressStyle = {
+		"--progress": time.completion,
+	} as CSSProperties;
 
 	return (
 		<ProgressWrapper>
@@ -55,8 +63,7 @@ const Progress: FC<{ time: ReturnType<typeof useTime>; activity: number }> = ({ 
 			</Row>
 			<Row>
 				<BarWrapper>
-					{/* @ts-ignore */}
-					<ProgressBar activity={activity} style={{ "--progress": time.completion }} />
+					<ProgressBar activity={activity} style={progressStyle} />
 				</BarWrapper>
 			</Row>
 		</ProgressWrapper>

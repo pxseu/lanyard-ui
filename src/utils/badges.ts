@@ -55,7 +55,7 @@ export const resolveBadges = (user: DiscordUser): Badge[] => {
 	}
 
 	// hacky way to check if the user has a nitro avatar
-	if (user.avatar && user.avatar.startsWith("a_")) {
+	if (user.avatar?.startsWith("a_")) {
 		badges.push({
 			id: "nitro",
 			url: `/assets/badges/nitro.png`,

@@ -1,5 +1,13 @@
-import { Presence } from "lanyard";
-import { DEFAULT_ID_VALUE, KEY_ID, KEY_TOKEN, PLACEHOLDER_PRESANCE, PRESANCE_KEY, USER_REGEX } from "./consts";
+import type { Presence } from "lanyard";
+import {
+	DEFAULT_ID_VALUE,
+	KEY_ID,
+	KEY_TOKEN,
+	LEGACY_PRESENCE_KEY,
+	PLACEHOLDER_PRESENCE,
+	PRESENCE_KEY,
+	USER_REGEX,
+} from "./consts";
 
 const getRawId = (): string | null => {
 	// check if path has an id
@@ -21,31 +29,39 @@ export const getToken = (): string | null => {
 	return localStorage.getItem(KEY_TOKEN);
 };
 
-const idMatchesPresence = (presance: Presence): boolean => {
+const idMatchesPresence = (presence: Presence): boolean => {
 	const stored = getRawId();
 
-	if (presance?.discord_user?.id === stored) return true;
+	if (presence.discord_user.id === stored) return true;
 
 	return false;
 };
 
 const getRawPresence = (): Presence | null => {
-	const presance = localStorage.getItem(PRESANCE_KEY);
+	const rawPresence = localStorage.getItem(PRESENCE_KEY) ?? localStorage.getItem(LEGACY_PRESENCE_KEY);
+
+	if (!rawPresence) return null;
 
 	try {
-		if (presance) return JSON.parse(presance);
-		return null;
-	} catch (e) {
-		throw e;
-		localStorage.removeItem(PRESANCE_KEY);
+		const presence = JSON.parse(rawPresence) as Presence;
+
+		if (!localStorage.getItem(PRESENCE_KEY)) {
+			localStorage.setItem(PRESENCE_KEY, rawPresence);
+		}
+		localStorage.removeItem(LEGACY_PRESENCE_KEY);
+
+		return presence;
+	} catch {
+		localStorage.removeItem(PRESENCE_KEY);
+		localStorage.removeItem(LEGACY_PRESENCE_KEY);
 		return null;
 	}
 };
 
 export const getPresence = () => {
-	const presance = getRawPresence();
+	const presence = getRawPresence();
 
-	if (presance && idMatchesPresence(presance)) return presance;
+	if (presence && idMatchesPresence(presence)) return presence;
 
-	return PLACEHOLDER_PRESANCE;
+	return PLACEHOLDER_PRESENCE;
 };

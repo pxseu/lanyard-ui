@@ -1,14 +1,15 @@
 import type { Presence } from "lanyard";
 
 const PREFIX_AND_VERSION = "lanyard:v1:" as const;
+const isDebugMode = typeof window !== "undefined" && window.localStorage.getItem("lanyard:debug") === "true";
 
 export const RECONNECT_INTERVAL = 500;
 export const MAX_RECONNECT_TIME = 5_000;
-export const PRODUCTION =
-	import.meta.env.PROD && localStorage.getItem("lanyard:debug") !== "true";
+export const PRODUCTION = import.meta.env.PROD && !isDebugMode;
 export const KEY_ID = `${PREFIX_AND_VERSION}id` as const;
 export const KEY_TOKEN = `${PREFIX_AND_VERSION}token` as const;
-export const PRESANCE_KEY = `${PREFIX_AND_VERSION}last_presance` as const;
+export const PRESENCE_KEY = `${PREFIX_AND_VERSION}last_presence` as const;
+export const LEGACY_PRESENCE_KEY = `${PREFIX_AND_VERSION}last_presance` as const;
 export const SORT_KEY = `${PREFIX_AND_VERSION}sort` as const;
 export const PLACEHOLDER = "/assets/placeholder.svg" as const;
 export const UNKNOWN_ALBUM = "/assets/album.svg" as const;
@@ -20,12 +21,12 @@ export const USER_REGEX = /^\d{17,}$/;
 export const KEY_REGEX = /^[a-z\d_]+$/i;
 export const KEY_MAX_LENGTH = 255;
 export const VALUE_MAX_LENGTH = 30_000;
-export const MAX_KEYS_AMMOUNT = 512;
+export const MAX_KEYS_AMOUNT = 512;
 export const LANYARD_BASE_URL = "https://api.lanyard.rest/v1" as const;
 export const SOCKET_URL = PRODUCTION ? "wss://lanyard.rest/socket?compression=zlib_json" : "wss://lanyard.rest/socket";
 export const AUTHOR_URL = "https://github.com/pxseu" as const;
 export const REPOSITORY_URL = `${AUTHOR_URL}/lanyard-ui` as const;
-export const PLACEHOLDER_PRESANCE = {
+export const PLACEHOLDER_PRESENCE = {
 	active_on_discord_desktop: false,
 	active_on_discord_mobile: false,
 	active_on_discord_web: false,

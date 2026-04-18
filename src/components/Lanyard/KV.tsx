@@ -1,11 +1,10 @@
+import { AnimatePresence, type Variants } from "framer-motion";
+import { useState } from "react";
+import styled from "styled-components";
 import { Wrapper } from "@/components/Common";
 import { useAppContext } from "@/hooks/useContexts";
-import { FC, useState } from "react";
-import styled from "styled-components";
-import KVElement from "./KVElement";
-// @ts-ignore
-import { AnimatePresence, Variants } from "framer-motion";
 import { useSort } from "@/hooks/useSort";
+import KVElement from "./KVElement";
 import SearchBar from "./SearchBar";
 
 const KVWrapper = styled(Wrapper)`
@@ -14,40 +13,53 @@ const KVWrapper = styled(Wrapper)`
 `;
 
 const KV_ANIMATION_VARIANTS: Variants = {
-	animate: { opacity: 1, height: "auto", marginTop: "5px", marginBottom: "5px", padding: "10px 14px" },
-	initial: { opacity: 0, height: 0, marginTop: 0, marginBottom: 0, padding: "0 14px" },
+	animate: {
+		opacity: 1,
+		height: "auto",
+		marginTop: "5px",
+		marginBottom: "5px",
+		padding: "10px 14px",
+	},
+	initial: {
+		opacity: 0,
+		height: 0,
+		marginTop: 0,
+		marginBottom: 0,
+		padding: "0 14px",
+	},
 };
 
-const KV: FC = () => {
+const KV = () => {
 	const context = useAppContext();
-	const sorthook = useSort();
+	const sortHook = useSort();
 	const [filter, setFilter] = useState("");
+	const { presence } = context;
 
-	if (!context.presance) return null;
+	if (!presence) return null;
 
-	const kv = Object.entries(context.presance?.kv);
+	const kv = Object.entries(presence.kv);
 
-	const sorted = sorthook.sorter(kv);
+	const sorted = sortHook.sorter(kv);
 	const filtered = !filter
 		? sorted
 		: sorted.filter(
 				([key, value]) =>
 					key.toLowerCase().includes(filter.toLowerCase()) ||
 					value.toLowerCase().includes(filter.toLowerCase()),
-		  );
+			);
 
 	return (
 		<KVWrapper>
 			<h2>Lanyard KV</h2>
 
-			<SearchBar sort={sorthook} onSearch={setFilter} />
+			<SearchBar sort={sortHook} onSearch={setFilter} />
 
 			<KVElement data={["", ""]} />
 
 			<AnimatePresence initial={false}>
 				{filtered.map((data) => (
 					<KVElement
-						key={`${context.presance?.discord_user.id ?? "0"}-${data[0]}`}
+						key={`${presence.discord_user.id}-${data[0]}`}
 						data={data}
 						initial="initial"
 						animate="animate"

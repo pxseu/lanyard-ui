@@ -1,7 +1,7 @@
-import { FC } from "react";
+import type { DiscordUser } from "lanyard";
+import type { FC } from "react";
 import styled from "styled-components";
 import { resolveBadges } from "@/utils/badges";
-import type { DiscordUser } from "lanyard";
 
 const BadgesWrapper = styled.div`
 	display: flex;

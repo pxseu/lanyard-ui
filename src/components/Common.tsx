@@ -1,7 +1,11 @@
-// @ts-ignore
 import { motion } from "framer-motion";
-import { FC } from "react";
-import styled, { DefaultTheme, StyledComponentProps } from "styled-components";
+import type { ComponentPropsWithoutRef } from "react";
+import styled, { css } from "styled-components";
+
+type InputProps = ComponentPropsWithoutRef<"input"> & { noSelect?: boolean };
+type TextAreaProps = ComponentPropsWithoutRef<"textarea"> & {
+	noSelect?: boolean;
+};
 
 export const Wrapper = styled.div`
 	position: relative;
@@ -9,13 +13,13 @@ export const Wrapper = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	justify-content: left;
+	justify-content: flex-start;
 	width: 90%;
 	padding: 10px;
 	border-radius: 10px;
 	max-width: 600px;
 	height: 100%;
-	background-color: ${({ theme }) => theme.colors.presance};
+	background-color: ${({ theme }) => theme.colors.surface};
 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
 
 	&:focus {
@@ -30,11 +34,11 @@ export const ErrorText = styled.span`
 	text-align: center;
 `;
 
-const InputBase = styled.input`
+const fieldStyles = css`
 	width: 100%;
 	flex: 1;
 	border: none;
-	background-color: ${({ theme }) => theme.colors.presance};
+	background-color: ${({ theme }) => theme.colors.surface};
 	color: ${({ theme }) => theme.colors.primary};
 	font-size: 1rem;
 	padding: 10px;
@@ -48,57 +52,41 @@ const InputBase = styled.input`
 	&:disabled {
 		color: ${({ theme }) => theme.colors.primary}aa;
 	}
+`;
+
+const InputBase = styled.input`
+	${fieldStyles}
 `;
 
 const TextAreaBase = styled.textarea`
-	width: 100%;
-	flex: 1;
-	border: none;
-	background-color: ${({ theme }) => theme.colors.presance};
-	color: ${({ theme }) => theme.colors.primary};
-	font-size: 1rem;
-	padding: 10px;
-	border-radius: 5px;
-	transition: outline 0.05s ease-in-out;
+	${fieldStyles}
 	resize: vertical;
 	min-height: 80px;
-
-	&:focus {
-		outline: 2px solid ${({ theme }) => theme.colors.outline};
-	}
-
-	&:disabled {
-		color: ${({ theme }) => theme.colors.primary}aa;
-	}
 `;
 
-export const TextArea: FC<StyledComponentProps<"textarea", DefaultTheme, { noSelect?: boolean }, never>> = ({
-	noSelect,
-	className,
-	...props
-}) => (
-	<TextAreaBase
-		className={`${InputBase.toString().substring(1)}${className ? ` ${className}` : ""}`}
-		{...props}
-		onFocus={(e) => {
-			if (!noSelect) e.target.select();
-			props?.onFocus?.(e);
-		}}
-	/>
-);
+export const TextArea = ({ noSelect, onFocus, ...props }: TextAreaProps) => {
+	return (
+		<TextAreaBase
+			{...props}
+			onFocus={(event) => {
+				if (!noSelect) event.target.select();
+				onFocus?.(event);
+			}}
+		/>
+	);
+};
 
-export const Input: FC<StyledComponentProps<"input", DefaultTheme, { noSelect?: boolean }, never>> = ({
-	noSelect,
-	...props
-}) => (
-	<InputBase
-		{...props}
-		onFocus={(e) => {
-			if (!noSelect) e.target.select();
-			props?.onFocus?.(e);
-		}}
-	/>
-);
+export const Input = ({ noSelect, onFocus, ...props }: InputProps) => {
+	return (
+		<InputBase
+			{...props}
+			onFocus={(event) => {
+				if (!noSelect) event.target.select();
+				onFocus?.(event);
+			}}
+		/>
+	);
+};
 
 export const Anchor = styled.a<{ elipsis?: boolean }>`
 	display: inline-block;
@@ -127,19 +115,16 @@ export const Button = styled.button`
 	padding: 5px 10px;
 	border-radius: 5px;
 	border: none;
-	background-color: ${({ theme }) => theme.colors.presance};
+	background-color: ${({ theme }) => theme.colors.surface};
 	color: ${({ theme }) => theme.colors.primary};
 	font-size: 1em;
 	cursor: pointer;
 	transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, outline 0.05s ease-in-out;
 
-	/* box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); */
-
 	&:hover,
 	&:focus {
-		background-color: ${({ theme }) => theme.colors.presance};
+		background-color: ${({ theme }) => theme.colors.surface};
 		outline: 2px solid ${({ theme }) => theme.colors.outline};
-		/* box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5); */
 	}
 `;
 
@@ -153,19 +138,16 @@ export const MotionButton = styled(motion.button)`
 	padding: 5px 10px;
 	border-radius: 5px;
 	border: none;
-	background-color: ${({ theme }) => theme.colors.presance};
+	background-color: ${({ theme }) => theme.colors.surface};
 	color: ${({ theme }) => theme.colors.primary};
 	font-size: 1em;
 	cursor: pointer;
 	transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, outline 0.05s ease-in-out;
 
-	/* box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); */
-
 	&:hover,
 	&:focus {
-		background-color: ${({ theme }) => theme.colors.presance};
+		background-color: ${({ theme }) => theme.colors.surface};
 		outline: 2px solid ${({ theme }) => theme.colors.outline};
-		/* box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5); */
 	}
 `;
 

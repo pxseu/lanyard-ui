@@ -41,8 +41,14 @@ $ bun install
 # Start development server
 $ bun run dev
 
+# Run static checks
+$ bun run typecheck
+
 # Build for production
 $ bun run build
+
+# Run the full local verification pass
+$ bun run check
 
 # Preview production build
 $ bun run preview

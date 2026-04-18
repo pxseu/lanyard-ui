@@ -1,9 +1,8 @@
-import { FC } from "react";
-import { useAppContext } from "@/hooks/useContexts";
-import { Wrapper } from "@/components/Common";
-import Activity from "./Activity";
-import { Activity as ActivityType } from "lanyard";
+import type { Activity as ActivityType } from "lanyard";
 import styled from "styled-components";
+import { Wrapper } from "@/components/Common";
+import { useAppContext } from "@/hooks/useContexts";
+import Activity from "./Activity";
 
 const DEFAULT_ACTIVITY = {
 	type: 0,
@@ -15,7 +14,7 @@ const DEFAULT_ACTIVITY = {
 	name: "Not doing anything",
 	details: "",
 	created_at: Date.now(),
-};
+} satisfies ActivityType;
 
 const ActivityWrapper = styled(Wrapper)`
 	display: flex;
@@ -35,12 +34,13 @@ const ActivityWrapper = styled(Wrapper)`
 	}
 `;
 
-const Activities: FC = () => {
-	const { presance } = useAppContext();
+const Activities = () => {
+	const { presence } = useAppContext();
 
-	if (!presance) return null;
+	if (!presence) return null;
 
-	const activities: ActivityType[] = presance.activities.length > 0 ? presance.activities : [DEFAULT_ACTIVITY];
+	const activities: ActivityType[] =
+		presence.activities.length > 0 ? presence.activities : [DEFAULT_ACTIVITY];
 
 	return (
 		<ActivityWrapper>

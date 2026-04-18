@@ -1,4 +1,3 @@
-import { FC } from "react";
 import styled from "styled-components";
 import { REPOSITORY_URL } from "@/utils/consts";
 import Center from "./Center";
@@ -28,7 +27,7 @@ const Code = styled.code`
 	border-radius: 5px;
 `;
 
-const ErrorPage: FC<{ error: unknown }> = ({ error }) => {
+const ErrorPage = ({ error }: { error: unknown }) => {
 	const errorMessage = (error instanceof Error ? error.message : error) || "Unknown error";
 
 	const handleClick = () => {
@@ -39,7 +38,7 @@ const ErrorPage: FC<{ error: unknown }> = ({ error }) => {
 	return (
 		<Center>
 			<Wrapper>
-				<Title>An unexpected error occured</Title>
+				<Title>An unexpected error occurred</Title>
 				{errorMessage && (
 					<Paragraph>
 						Message: <Code>{String(errorMessage)}</Code>

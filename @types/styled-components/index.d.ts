@@ -5,16 +5,16 @@ import "styled-components";
 declare module "styled-components" {
 	export interface DefaultTheme {
 		colors: {
-			primary: "#fafafa";
-			background: "#202020";
-			presance: "#2a2a2a";
-			outline: "#acc0ff";
-			error: "#af0000";
-			spotify: "#1DB954";
-			gray: "#828282";
+			primary: string;
+			background: string;
+			surface: string;
+			outline: string;
+			error: string;
+			spotify: string;
+			gray: string;
 		};
 		breakpoints: {
-			mobile: "320px";
+			mobile: string;
 		};
 	}
 }

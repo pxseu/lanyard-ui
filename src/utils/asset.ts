@@ -1,5 +1,10 @@
-import { Activity, Emoji } from "lanyard";
-import { ADD_MEDIA_URL, PLACEHOLDER, UNKNOWN_ALBUM, TWEMOJI_CDN } from "@/utils/consts";
+import type { Activity, Emoji } from "lanyard";
+import {
+	ADD_MEDIA_URL,
+	PLACEHOLDER,
+	TWEMOJI_CDN,
+	UNKNOWN_ALBUM,
+} from "@/utils/consts";
 
 const resolveAsset = (applicationId?: string, asset?: string) => {
 	const split = asset?.split(":") || [];
@@ -18,7 +23,8 @@ const resolveAsset = (applicationId?: string, asset?: string) => {
 		return `https://media.discordapp.net/${split[1]}`;
 	}
 
-	if (applicationId && !asset) return `${ADD_MEDIA_URL}/app-icons/${applicationId}.webp?size=512`;
+	if (applicationId && !asset)
+		return `${ADD_MEDIA_URL}/app-icons/${applicationId}.webp?size=512`;
 
 	// if no asset is provided return default image
 	if (!applicationId || !asset) return PLACEHOLDER;
@@ -34,13 +40,17 @@ const resolveEmoji = (emoji: Emoji) => {
 			.map((em) => em.codePointAt(0)?.toString(16))
 			.join("-")}.svg`;
 	// if emoji is not animated use png
-	if (!emoji.animated) return `https://cdn.discordapp.com/emojis/${emoji.id}.png`;
+	if (!emoji.animated)
+		return `https://cdn.discordapp.com/emojis/${emoji.id}.png`;
 
 	// if emoji is animated use gif
 	return `https://cdn.discordapp.com/emojis/${emoji.id}.gif`;
 };
 
-export const resolveActivity = (activity: Activity | undefined, type: "large" | "small") => {
+export const resolveActivity = (
+	activity: Activity | undefined,
+	type: "large" | "small",
+) => {
 	if (!activity) return PLACEHOLDER;
 
 	if (type !== "large")
@@ -48,10 +58,12 @@ export const resolveActivity = (activity: Activity | undefined, type: "large" | 
 			? resolveAsset(activity?.application_id, activity?.assets?.small_image)
 			: null;
 
-	if (activity.type === 4 && !!activity.emoji) return resolveEmoji(activity.emoji);
+	if (activity.type === 4 && !!activity.emoji)
+		return resolveEmoji(activity.emoji);
 
 	const largeImage =
-		activity?.assets?.large_image ?? (activity?.id?.startsWith("spotify:") ? activity.id : undefined);
+		activity?.assets?.large_image ??
+		(activity?.id?.startsWith("spotify:") ? activity.id : undefined);
 
 	return resolveAsset(activity.application_id, largeImage);
 };

@@ -1,28 +1,38 @@
+import type {
+	Presence,
+	SocketMessageReceive,
+	SocketMessageSend,
+} from "lanyard";
 import { useEffect, useReducer, useRef } from "react";
-import type { Presence, SocketMessageRecieve, SocketMessageSend } from "lanyard";
-import { logger } from "@/utils/log";
 import {
-	PRESANCE_KEY,
+	KEY_ID,
+	KEY_MAX_LENGTH,
+	KEY_REGEX,
+	KEY_TOKEN,
+	LANYARD_BASE_URL,
+	MAX_KEYS_AMOUNT,
+	MAX_RECONNECT_TIME,
+	PRESENCE_KEY,
+	PRODUCTION,
+	RECONNECT_INTERVAL,
 	SOCKET_URL,
 	USER_REGEX,
-	LANYARD_BASE_URL,
-	KEY_REGEX,
 	VALUE_MAX_LENGTH,
-	KEY_ID,
-	KEY_TOKEN,
-	RECONNECT_INTERVAL,
-	MAX_RECONNECT_TIME,
-	KEY_MAX_LENGTH,
-	MAX_KEYS_AMMOUNT,
 } from "@/utils/consts";
-import { parse, stringify } from "@/utils/parse";
 import { getPresence, getToken } from "@/utils/getCached";
+import { logger } from "@/utils/log";
+import { parse, stringify } from "@/utils/parse";
+
+declare global {
+	interface Window {
+		socket?: WebSocket;
+	}
+}
 
 enum Events {
-	presance = "presence",
+	presence = "presence",
 	open = "open",
 	close = "close",
-	reconnect = "init",
 	subscribe = "subscribe",
 	token = "token",
 	toggleStore = "toggleStore",
@@ -30,12 +40,13 @@ enum Events {
 
 enum Errors {
 	notFound = "Could not find this user",
+	socketNotReady = "Socket is not connected",
 }
 
 interface State {
 	presence: Presence | null;
 	connected: boolean;
-	subscibed: string | null;
+	subscribed: string | null;
 	token: string | null;
 	store: boolean;
 }
@@ -45,7 +56,7 @@ type Action =
 			type: Events.open | Events.close | Events.toggleStore;
 	  }
 	| {
-			type: Events.presance;
+			type: Events.presence;
 			payload: Presence;
 	  }
 	| {
@@ -53,8 +64,22 @@ type Action =
 			payload: string;
 	  };
 
+type KVMethod = "PUT" | "PATCH" | "DELETE";
+
 const socketLog = logger("info", "Socket", true);
 const lanyardLog = logger("info", "Lanyard");
+
+const getInitialState = (): State => {
+	const token = getToken();
+
+	return {
+		presence: getPresence(),
+		connected: false,
+		subscribed: null,
+		token,
+		store: token !== null,
+	};
+};
 
 const reducer = (state: State, action: Action): State => {
 	switch (action.type) {
@@ -76,13 +101,17 @@ const reducer = (state: State, action: Action): State => {
 			};
 		}
 
-		case Events.presance: {
-			lanyardLog("Presence recieved", action.payload);
+		case Events.presence: {
+			lanyardLog("Presence received", action.payload);
 
-			if (action.payload && Object.keys(action.payload).length === 0) return state;
-			if (state.subscibed && state.subscibed !== action.payload.discord_user?.id) return state;
+			if (Object.keys(action.payload).length === 0) return state;
+			if (
+				state.subscribed &&
+				state.subscribed !== action.payload.discord_user.id
+			)
+				return state;
 
-			localStorage.setItem(PRESANCE_KEY, JSON.stringify(action.payload));
+			localStorage.setItem(PRESENCE_KEY, JSON.stringify(action.payload));
 
 			return {
 				...state,
@@ -91,17 +120,17 @@ const reducer = (state: State, action: Action): State => {
 		}
 
 		case Events.subscribe: {
-			lanyardLog("Subscibed to", action.payload);
+			lanyardLog("Subscribed to", action.payload);
 			localStorage.setItem(KEY_ID, action.payload);
 
 			return {
 				...state,
-				subscibed: action.payload,
+				subscribed: action.payload,
 			};
 		}
 
 		case Events.token: {
-			lanyardLog("Token recieved");
+			lanyardLog("Token received");
 
 			if (state.store) localStorage.setItem(KEY_TOKEN, action.payload);
 
@@ -113,14 +142,14 @@ const reducer = (state: State, action: Action): State => {
 
 		case Events.toggleStore: {
 			lanyardLog("Toggled store");
-			const value = !state.store;
+			const nextStoreValue = !state.store;
 
-			if (value) localStorage.setItem(KEY_TOKEN, state.token ?? "");
+			if (nextStoreValue) localStorage.setItem(KEY_TOKEN, state.token ?? "");
 			else localStorage.removeItem(KEY_TOKEN);
 
 			return {
 				...state,
-				store: value,
+				store: nextStoreValue,
 			};
 		}
 
@@ -130,63 +159,81 @@ const reducer = (state: State, action: Action): State => {
 };
 
 export const useLanyard = () => {
-	const [state, dispatch] = useReducer(reducer, {
-		presence: getPresence(),
-		connected: false,
-		subscibed: null,
-		token: getToken(),
-		store: !!(getToken() || true),
-	});
+	const [state, dispatch] = useReducer(reducer, undefined, getInitialState);
 
 	const socket = useRef<WebSocket | null>(null);
 	const heartbeat = useRef<ReturnType<typeof setInterval> | null>(null);
-	const awaiting = useRef<((value: unknown) => void)[]>([]);
+	const awaiting = useRef<Array<() => void>>([]);
 	const subscribed = useRef<string | null>(null);
 	const reconnect = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const unmounted = useRef(false);
 
-	const waitUntilConnected = () =>
-		new Promise((resolve) => {
-			awaiting.current.push(resolve);
-		});
-
-	const send = async (data: SocketMessageSend, force: boolean = false) => {
-		if (!socket.current && !force) await waitUntilConnected();
-
-		socketLog("Sending", data);
-
-		const message = stringify(data);
-
-		socket.current!.send(message);
+	const clearHeartbeat = () => {
+		if (!heartbeat.current) return;
+		clearInterval(heartbeat.current);
+		heartbeat.current = null;
 	};
 
-	const subscribe = async (user: string, resubscribe: boolean = false) => {
-		if (!resubscribe && state.subscibed === user && socket.current) return;
+	const clearReconnect = () => {
+		if (!reconnect.current) return;
+		clearTimeout(reconnect.current);
+		reconnect.current = null;
+	};
 
-		if (!USER_REGEX.test(user)) throw new Error(Errors.notFound);
+	const resolveAwaiting = () => {
+		for (const resolve of awaiting.current) resolve();
+		awaiting.current = [];
+	};
 
-		// fetch the user to check if they exist
-		try {
-			const res = await fetch(`${LANYARD_BASE_URL}/users/${user}`);
-			if (!res.ok) throw new Error(Errors.notFound);
+	const waitUntilConnected = () => {
+		if (socket.current?.readyState === WebSocket.OPEN) return Promise.resolve();
 
-			// dispatch the presance via an async action
-			res.json().then(({ data }) => dispatch({ type: Events.presance, payload: data }));
-		} catch (error) {
-			throw error;
+		return new Promise<void>((resolve) => {
+			awaiting.current.push(resolve);
+		});
+	};
+
+	const send = async (data: SocketMessageSend, force = false) => {
+		if (!force && socket.current?.readyState !== WebSocket.OPEN) {
+			await waitUntilConnected();
 		}
 
-		// if a user is already subscribed, unsubscribe
-		if (subscribed.current && !resubscribe)
-			send({
+		if (!socket.current || socket.current.readyState !== WebSocket.OPEN) {
+			throw new Error(Errors.socketNotReady);
+		}
+
+		socketLog("Sending", data);
+		socket.current.send(stringify(data));
+	};
+
+	const subscribe = async (user: string, resubscribe = false) => {
+		if (!USER_REGEX.test(user)) throw new Error(Errors.notFound);
+		if (
+			!resubscribe &&
+			state.subscribed === user &&
+			socket.current?.readyState === WebSocket.OPEN
+		)
+			return;
+
+		const response = await fetch(`${LANYARD_BASE_URL}/users/${user}`);
+		if (!response.ok) throw new Error(Errors.notFound);
+
+		const { data } = (await response.json()) as { data: Presence };
+
+		if (subscribed.current && !resubscribe) {
+			await send({
 				op: 4,
 				d: {
 					unsubscribe_from_id: subscribed.current,
 				},
 			});
+		}
 
 		if (!resubscribe) dispatch({ type: Events.subscribe, payload: user });
 
-		send({
+		dispatch({ type: Events.presence, payload: data });
+
+		await send({
 			op: 2,
 			d: {
 				subscribe_to_id: user,
@@ -204,169 +251,171 @@ export const useLanyard = () => {
 
 	const kvValidate = (key: string, data?: string) => {
 		if (key === "") throw new Error("Key cannot be empty");
-		if (key.length > KEY_MAX_LENGTH) throw new Error(`Key cannot be longer than ${KEY_MAX_LENGTH} characters`);
-		if (!KEY_REGEX.test(key)) throw new Error("Key must be an alphanumeric string with underscores");
-		if (data && data.length > VALUE_MAX_LENGTH) throw new Error(`Value cannot be longer than ${VALUE_MAX_LENGTH}`);
+		if (key.length > KEY_MAX_LENGTH)
+			throw new Error(`Key cannot be longer than ${KEY_MAX_LENGTH} characters`);
+		if (!KEY_REGEX.test(key))
+			throw new Error("Key must be an alphanumeric string with underscores");
+		if (data && data.length > VALUE_MAX_LENGTH)
+			throw new Error(`Value cannot be longer than ${VALUE_MAX_LENGTH}`);
 	};
 
-	type Request = ((method: "PUT", path: string, body: string) => Promise<void>) &
-		((method: "PATCH", path: string, data: string) => Promise<void>) &
-		((method: "DELETE", path: string) => Promise<void>);
-
-	const kvApi: Request = async (method: "PUT" | "PATCH" | "DELETE", path: string, body?: any) => {
-		if (!state.subscibed) throw new Error("Not subscibed");
+	const kvApi = async (method: KVMethod, path: string, body?: string) => {
+		if (!state.subscribed) throw new Error("Not subscribed");
 		if (!state.token) throw new Error("No token");
-		if (Object.entries(state.presence?.kv ?? {}).length >= MAX_KEYS_AMMOUNT)
+
+		const key = decodeURIComponent(path.replace(/^\//, ""));
+		const keys = state.presence?.kv ?? {};
+		const isNewKey = method === "PUT" && key !== "" && !(key in keys);
+
+		if (isNewKey && Object.keys(keys).length >= MAX_KEYS_AMOUNT) {
 			throw new Error("You have reached the maximum amount of keys");
+		}
 
-		const res = await fetch(`${LANYARD_BASE_URL}/users/${state.subscibed}/kv${path}`, {
-			method,
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: state.token,
+		const response = await fetch(
+			`${LANYARD_BASE_URL}/users/${state.subscribed}/kv${path}`,
+			{
+				method,
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: state.token,
+				},
+				body,
 			},
-			body,
-		});
+		);
 
-		if (!res.ok)
-			switch (res.status) {
-				case 401:
-				case 403:
-					throw new Error("Invalid token");
+		if (response.ok) return;
 
-				case 404:
-					throw new Error("Key not found");
+		switch (response.status) {
+			case 401:
+			case 403:
+				throw new Error("Invalid token");
 
-				default:
-					throw new Error("Unknown error");
-			}
-		// return res.json();
+			case 404:
+				throw new Error("Key not found");
+
+			default:
+				throw new Error("Unknown error");
+		}
 	};
 
 	const heartbeatSend = () => {
 		socketLog("Heartbeat");
-
-		send(
-			{
-				op: 3,
-			},
-			true,
-		);
+		void send({ op: 3 }, true);
 	};
 
-	const connect = (timeout?: number) => {
-		if (!socket.current) {
-			socket.current = new WebSocket(SOCKET_URL);
-			socket.current.binaryType = "arraybuffer";
+	const connect = (delay = 0) => {
+		if (socket.current || unmounted.current) return;
 
-			// @ts-expect-error lol
-			window.socket = socket.current;
-		}
+		const currentSocket = new WebSocket(SOCKET_URL);
+		currentSocket.binaryType = "arraybuffer";
+		socket.current = currentSocket;
+		if (!PRODUCTION) window.socket = currentSocket;
 
-		const handleOpen = (event: Event) => {
-			dispatch({ type: Events.open });
+		const cleanupSocket = () => {
+			clearHeartbeat();
 
-			// if a user was subscibed before we assume it was a reconnect
-			if (subscribed.current) {
-				socketLog("Resubscibing to", subscribed.current);
-				subscribe(subscribed.current, true);
-			}
-
-			if (awaiting.current.length) {
-				for (const resolve of awaiting.current) resolve(void null);
-				awaiting.current = [];
-			}
-
-			socketLog("Connected: ", event);
+			if (window.socket === currentSocket) delete window.socket;
+			if (socket.current === currentSocket) socket.current = null;
 		};
 
-		const handleClose = (event: CloseEvent | string) => {
-			socketLog("Closed: ", event);
+		const scheduleReconnect = () => {
+			if (unmounted.current) return;
 
-			if (socket.current) {
-				socket.current.close();
-				socket.current = null;
-			}
+			clearReconnect();
 
-			if (heartbeat.current) {
-				clearInterval(heartbeat.current);
-				heartbeat.current = null;
-			}
-
-			const time = timeout
-				? timeout > MAX_RECONNECT_TIME
-					? RECONNECT_INTERVAL + timeout
-					: RECONNECT_INTERVAL
-				: 0;
+			const waitTime = delay === 0 ? RECONNECT_INTERVAL : delay;
+			const nextDelay = Math.min(
+				waitTime + RECONNECT_INTERVAL,
+				MAX_RECONNECT_TIME,
+			);
 
 			reconnect.current = setTimeout(() => {
 				reconnect.current = null;
-				connect(timeout ?? RECONNECT_INTERVAL);
-			}, time);
+				connect(nextDelay);
+			}, waitTime);
+		};
+
+		const handleOpen = (event: Event) => {
+			dispatch({ type: Events.open });
+			resolveAwaiting();
+
+			if (subscribed.current) {
+				socketLog("Resubscribing to", subscribed.current);
+				void subscribe(subscribed.current, true);
+			}
+
+			socketLog("Connected:", event);
+		};
+
+		const handleClose = (event: CloseEvent) => {
+			socketLog("Closed:", event);
+			cleanupSocket();
+			dispatch({ type: Events.close });
+			scheduleReconnect();
 		};
 
 		const handleError = (event: Event) => {
 			socketLog("Error", event);
-			return handleClose("error");
+			currentSocket.close();
 		};
 
-		const handleMessage = (event: MessageEvent) => {
-			const data = parse<SocketMessageRecieve>(event.data);
+		const handleMessage = (event: MessageEvent<ArrayBuffer | string>) => {
+			const data = parse<SocketMessageReceive>(event.data);
 
 			switch (data.op) {
 				case 0: {
-					if (data.t === "INIT_STATE")
-						return dispatch({
-							type: Events.presance,
+					if (data.t === "INIT_STATE" || data.t === "PRESENCE_UPDATE") {
+						dispatch({
+							type: Events.presence,
 							payload: data.d,
 						});
-
-					if (data.t === "PRESENCE_UPDATE")
-						return dispatch({
-							type: Events.presance,
-							payload: data.d,
-						});
-
+					}
 					break;
 				}
 
 				case 1: {
-					heartbeat.current = setInterval(heartbeatSend, data.d.heartbeat_interval);
+					clearHeartbeat();
+					heartbeat.current = setInterval(
+						heartbeatSend,
+						data.d.heartbeat_interval,
+					);
 					break;
 				}
 
-				default: {
+				default:
 					break;
-				}
 			}
 		};
 
-		socket.current.addEventListener("open", handleOpen);
-		socket.current.addEventListener("close", handleClose);
-		socket.current.addEventListener("message", handleMessage);
-		socket.current.addEventListener("error", handleError);
+		currentSocket.addEventListener("open", handleOpen);
+		currentSocket.addEventListener("close", handleClose);
+		currentSocket.addEventListener("message", handleMessage);
+		currentSocket.addEventListener("error", handleError);
 	};
 
 	useEffect(() => {
+		unmounted.current = false;
 		connect();
 
 		return () => {
+			unmounted.current = true;
+			clearReconnect();
+			clearHeartbeat();
 			socket.current?.close();
 			socket.current = null;
-			dispatch({ type: Events.close });
+
+			if (window.socket) delete window.socket;
 		};
 	}, []);
 
-	// stupid hack for state to be updated
 	useEffect(() => {
-		if (!state.subscibed) return;
-		subscribed.current = state.subscibed;
-	}, [state.subscibed]);
+		subscribed.current = state.subscribed;
+	}, [state.subscribed]);
 
 	return {
-		presance: state.presence,
+		presence: state.presence,
 		connecting: !state.connected,
-		subscribed: state.subscibed,
+		subscribed: state.subscribed,
 		store: state.store,
 		token: state.token,
 		subscribe,

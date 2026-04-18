@@ -1,16 +1,22 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App";
+import { HelmetProvider } from "react-helmet-async";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
-import theme from "@/utils/theme";
 import ErrorBoundary from "@/components/Boundary";
+import theme from "@/utils/theme";
+import App from "./App";
 
 const Global = createGlobalStyle`
 	*, *:before, *:after {
 		box-sizing: border-box;
 		margin: 0;
-			padding: 0;
+		padding: 0;
 	}
+
+	html, body {
+		min-height: 100%;
+	}
+
 	body {
 		font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",  "Oxygen";
 		font-size: 16px;
@@ -59,10 +65,12 @@ const root = createRoot(rootElement);
 root.render(
 	<StrictMode>
 		<ThemeProvider theme={theme}>
-			<Global />
-			<ErrorBoundary>
-				<App />
-			</ErrorBoundary>
+			<HelmetProvider>
+				<Global />
+				<ErrorBoundary>
+					<App />
+				</ErrorBoundary>
+			</HelmetProvider>
 		</ThemeProvider>
 	</StrictMode>,
 );

@@ -1,7 +1,7 @@
-import { useFetchCached } from "@/hooks/fetchCached";
-import { DiscordUser } from "lanyard";
-import { FC } from "react";
+import type { DiscordUser } from "lanyard";
+import type { FC } from "react";
 import styled from "styled-components";
+import { useFetchCached } from "@/hooks/fetchCached";
 
 // https://cdn.discordapp.com/clan-badges/${clan.identity_guild_id}/${clan.badge}.png
 
@@ -38,10 +38,10 @@ const ClanName = styled.p`
 	font-weight: 600;
 `;
 
-const Clan: FC<{ clan: DiscordUser["clan"] }> = ({ clan }) => {
-	if (!clan) return null;
-
-	const image = useFetchCached(`https://cdn.discordapp.com/clan-badges/${clan.identity_guild_id}/${clan.badge}.png`);
+const Clan: FC<{ clan: NonNullable<DiscordUser["clan"]> }> = ({ clan }) => {
+	const image = useFetchCached(
+		`https://cdn.discordapp.com/clan-badges/${clan.identity_guild_id}/${clan.badge}.png`,
+	);
 
 	return (
 		<Wrapper>

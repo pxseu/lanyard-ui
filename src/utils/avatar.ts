@@ -1,11 +1,11 @@
-import { DiscordUser } from "lanyard";
+import type { DiscordUser } from "lanyard";
 import { DEFAULT_AVATAR_PATH } from "./consts";
 
 const resolveDefaultAvatar = (user: DiscordUser) => {
-	let index;
+	let index: number;
 
 	if (user.discriminator !== "0") {
-		index = parseInt(user.discriminator) % 5;
+		index = parseInt(user.discriminator, 10) % 5;
 	} else {
 		const math = (BigInt(user.id) >> BigInt(22)) % BigInt(6);
 
@@ -30,6 +30,7 @@ export const resolveAvatar = (user?: DiscordUser) => {
 };
 
 export const resolveDecoration = (hovering: boolean, user?: DiscordUser) => {
-	if (!user || !user.avatar_decoration_data) return null;
+	if (!user?.avatar_decoration_data) return null;
+
 	return `https://cdn.discordapp.com/avatar-decoration-presets/${user.avatar_decoration_data.asset}?passthrough=${hovering}&size=512`;
 };

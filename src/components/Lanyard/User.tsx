@@ -1,15 +1,13 @@
+import { motion } from "framer-motion";
+import styled from "styled-components";
 import { Wrapper } from "@/components/Common";
 import { useFetchCached } from "@/hooks/fetchCached";
 import { useAppContext } from "@/hooks/useContexts";
-import { FC } from "react";
-import styled from "styled-components";
+import { resolveAvatar, resolveDecoration } from "@/utils/avatar";
 import { ADD_MEDIA_URL } from "@/utils/consts";
 import { colorFromStatus } from "@/utils/status";
-import { resolveAvatar, resolveDecoration } from "@/utils/avatar";
-import Clan from "./Clan";
 import Badges from "./Badges";
-// @ts-ignore
-import { AnimatePresence, motion } from "framer-motion";
+import Clan from "./Clan";
 
 const UserWrapper = styled(Wrapper)`
 	border-radius: 10px;
@@ -45,7 +43,7 @@ const Avatar = styled(Banner)`
 	border-radius: 50%;
 	z-index: 2;
 	padding: 5px;
-	background-color: ${({ theme }) => theme.colors.presance};
+	background-color: ${({ theme }) => theme.colors.surface};
 `;
 
 const TextWrapper = styled.div`
@@ -63,7 +61,7 @@ const Username = styled.p`
 	max-width: 100%;
 	display: inline-block;
 	font-size: 2em;
-	background-color: ${({ theme }) => theme.colors.presance}50;
+	background-color: ${({ theme }) => theme.colors.surface}50;
 	flex-shrink: 1;
 	word-wrap: break-word;
 	text-align: center;
@@ -91,7 +89,7 @@ const Status = styled.div<{ color: string }>`
 	height: 32px;
 	border-radius: 50%;
 	background-color: ${({ color }) => colorFromStatus(color)};
-	border: 5px solid ${({ theme }) => theme.colors.presance};
+	border: 5px solid ${({ theme }) => theme.colors.surface};
 	z-index: 4;
 `;
 
@@ -100,8 +98,8 @@ const DecorationImage = styled.img`
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	width: 105%;
-	height: 105%;
+	width: 115%;
+	height: 115%;
 	z-index: 3;
 
 	::before {
@@ -109,52 +107,66 @@ const DecorationImage = styled.img`
 	}
 `;
 
-const User: FC = () => {
+const User = () => {
 	const state = useAppContext();
-	const avatar = useFetchCached(resolveAvatar(state?.presance?.discord_user));
-	const banner = useFetchCached(`${ADD_MEDIA_URL}/banners/${state.presance?.discord_user.id}?size=512`);
-	const decorationHover = useFetchCached(resolveDecoration(true, state?.presance?.discord_user));
-	const decoration = useFetchCached(resolveDecoration(false, state?.presance?.discord_user));
+	const { presence } = state;
+	const avatar = useFetchCached(
+		presence ? resolveAvatar(presence.discord_user) : null,
+	);
+	const banner = useFetchCached(
+		presence
+			? `${ADD_MEDIA_URL}/banners/${presence.discord_user.id}?size=512`
+			: null,
+	);
+	const decorationHover = useFetchCached(
+		presence ? resolveDecoration(true, presence.discord_user) : null,
+	);
+	const decoration = useFetchCached(
+		presence ? resolveDecoration(false, presence.discord_user) : null,
+	);
 
-	if (!state.presance) return null;
+	if (!presence) return null;
 
 	return (
 		<UserWrapper>
 			<Banner show={!!banner} src={banner} alt="User banner" />
-			<AvatarWrapper title={state.presance.discord_status} isBanner={!!banner}>
+			<AvatarWrapper title={presence.discord_status} isBanner={!!banner}>
 				<Avatar show={!!avatar} src={avatar} alt="User avatar" />
-				<Status color={state.presance.discord_status} />
-				{state.presance.discord_user.avatar_decoration_data && decoration && decorationHover && (
-					<DecorationImage
-						src={decoration}
-						alt="User decoration"
-						onMouseEnter={(e) => {
-							e.currentTarget.src = decorationHover;
-						}}
-						onMouseLeave={(e) => {
-							e.currentTarget.src = decoration;
-						}}
-					/>
-				)}
+				<Status color={presence.discord_status} />
+				{presence.discord_user.avatar_decoration_data &&
+					decoration &&
+					decorationHover && (
+						<DecorationImage
+							src={decoration}
+							alt="User decoration"
+							onMouseEnter={(e) => {
+								e.currentTarget.src = decorationHover;
+							}}
+							onMouseLeave={(e) => {
+								e.currentTarget.src = decoration;
+							}}
+						/>
+					)}
 			</AvatarWrapper>
 			<TextWrapper>
-				{state.presance.discord_user.discriminator !== "0" ? (
+				{presence.discord_user.discriminator !== "0" ? (
 					<Username>
-						{state.presance.discord_user.username}
-						<Discriminator>#{state.presance.discord_user.discriminator}</Discriminator>
+						{presence.discord_user.username}
+						<Discriminator>
+							#{presence.discord_user.discriminator}
+						</Discriminator>
 					</Username>
 				) : (
 					<>
-						<Username>{state.presance.discord_user.global_name}</Username>
-						<GlobalName>{state.presance.discord_user.username}</GlobalName>
+						<Username>{presence.discord_user.global_name}</Username>
+						<GlobalName>{presence.discord_user.username}</GlobalName>
 					</>
 				)}
-				<Badges user={state.presance.discord_user} />
-				<Clan clan={state.presance.discord_user.clan} />
+				<Badges user={presence.discord_user} />
+				{presence.discord_user.clan ? (
+					<Clan clan={presence.discord_user.clan} />
+				) : null}
 			</TextWrapper>
-			{/* <TextWrapper>
-				<Id title={state.presance.discord_user.id}>{state.presance.discord_user.id}</Id>
-			</TextWrapper> */}
 		</UserWrapper>
 	);
 };

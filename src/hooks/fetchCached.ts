@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
-import { DEFAULT_AVATAR_PATH, ADD_MEDIA_URL, PLACEHOLDER_PRESANCE } from "@/utils/consts";
+import {
+	ADD_MEDIA_URL,
+	DEFAULT_AVATAR_PATH,
+	PLACEHOLDER_PRESENCE,
+} from "@/utils/consts";
 
-const fetchUrl = async (url: string) => {
-	const response = await fetch(url);
-	const blob = await (response.ok ? response.blob() : Promise.reject(new Error("Network response was not ok.")));
+const fetchUrl = async (url: string, signal: AbortSignal) => {
+	const response = await fetch(url, { signal });
+	const blob = await (response.ok
+		? response.blob()
+		: Promise.reject(new Error("Network response was not ok.")));
 	return URL.createObjectURL(blob);
 };
 
@@ -11,30 +17,54 @@ export const useFetchCached = (url: string | null): string | undefined => {
 	const [data, setData] = useState<string | undefined>();
 	const [oldUrl, setOldUrl] = useState<string | null>(null);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: its fine
 	useEffect(() => {
 		if (url === oldUrl) return;
 
-		let mounted = true;
+		const controller = new AbortController();
+		let objectUrl: string | null = null;
 
-		const setDataWithUrl = (imageData: string) => {
-			if (!mounted) return;
+		if (!url) {
 			setOldUrl(url);
-			setData(imageData);
-		};
+			setData(undefined);
+			return;
+		}
 
-		if (!url) return setOldUrl(url);
-		if (url.startsWith(`${ADD_MEDIA_URL}/${PLACEHOLDER_PRESANCE.discord_user.id}`)) return setData(undefined);
-		if (url.startsWith(DEFAULT_AVATAR_PATH)) return setDataWithUrl(url);
+		if (
+			url.startsWith(`${ADD_MEDIA_URL}/${PLACEHOLDER_PRESENCE.discord_user.id}`)
+		) {
+			setOldUrl(url);
+			setData(undefined);
+			return;
+		}
+
+		if (url.startsWith(DEFAULT_AVATAR_PATH)) {
+			setOldUrl(url);
+			setData(url);
+			return;
+		}
 
 		setData(undefined);
 		setOldUrl(null);
 
-		fetchUrl(url)
-			.then((blob) => mounted && setDataWithUrl(blob))
-			.catch(() => mounted && setData(undefined));
+		void fetchUrl(url, controller.signal)
+			.then((fetchedUrl) => {
+				objectUrl = fetchedUrl;
+				setOldUrl(url);
+				setData(fetchedUrl);
+			})
+			.catch((error: unknown) => {
+				if (error instanceof DOMException && error.name === "AbortError") {
+					return;
+				}
+
+				setData(undefined);
+				setOldUrl(null);
+			});
 
 		return () => {
-			mounted = false;
+			controller.abort();
+			if (objectUrl) URL.revokeObjectURL(objectUrl);
 		};
 	}, [url]);
 

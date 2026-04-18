@@ -1,10 +1,11 @@
-import type { useSort } from "@/hooks/useSort";
-import { Button, ElementWrapper, Input } from "@/components/Common";
-import { FC } from "react";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
+import {
+	AiOutlineSortAscending,
+	AiOutlineSortDescending,
+} from "react-icons/ai";
 import styled from "styled-components";
-import { AiOutlineSortAscending, AiOutlineSortDescending } from "react-icons/ai";
-// @ts-ignore
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { Button, ElementWrapper, Input } from "@/components/Common";
+import type { useSort } from "@/hooks/useSort";
 
 interface SearchBarProps {
 	sort: ReturnType<typeof useSort>;
@@ -46,17 +47,32 @@ const IconVariants: Variants = {
 	},
 };
 
-const SearchBar: FC<SearchBarProps> = ({ sort, onSearch }) => (
+const SearchBar = ({ sort, onSearch }: SearchBarProps) => (
 	<ElementWrapper>
-		<Input placeholder="Search" onChange={(e) => onSearch(e.target.value)} />
+		<Input
+			placeholder="Search"
+			onChange={(event) => onSearch(event.target.value)}
+		/>
 		<SortButton onClick={() => sort.toggleSort()}>
 			<AnimatePresence exitBeforeEnter initial={false}>
 				{sort.type === "asc" ? (
-					<IconWrapper key="asc" variants={IconVariants} initial="initial" animate="animate" exit="exit">
+					<IconWrapper
+						key="asc"
+						variants={IconVariants}
+						initial="initial"
+						animate="animate"
+						exit="exit"
+					>
 						<AiOutlineSortAscending fontSize={20} />
 					</IconWrapper>
 				) : (
-					<IconWrapper key="desc" variants={IconVariants} initial="initial" animate="animate" exit="exit">
+					<IconWrapper
+						key="desc"
+						variants={IconVariants}
+						initial="initial"
+						animate="animate"
+						exit="exit"
+					>
 						<AiOutlineSortDescending fontSize={20} />
 					</IconWrapper>
 				)}

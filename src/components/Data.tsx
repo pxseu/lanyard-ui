@@ -1,8 +1,7 @@
-// @ts-ignore
-import { AnimatePresence, motion, Variants } from "framer-motion";
-import { useAppContext } from "@/hooks/useContexts";
-import { FC, useEffect, useReducer } from "react";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
+import { useEffect, useReducer } from "react";
 import styled from "styled-components";
+import { useAppContext } from "@/hooks/useContexts";
 import { getId } from "@/utils/getCached";
 import { Button, ErrorText, Input, Wrapper } from "./Common";
 
@@ -55,7 +54,7 @@ const DataButton = styled(Button)`
 	max-width: 600px;
 `;
 
-const AniamtedWrapper = motion(Wrapper);
+const AnimatedWrapper = motion(Wrapper);
 
 const WrapperVariants: Variants = {
 	initial: {
@@ -90,11 +89,11 @@ interface State {
 
 type Action =
 	| {
-			type: "set_id" | "set_token";
+			type: "set_id";
 			payload: string;
 	  }
 	| {
-			type: "toggle_store" | "toggle_show_token" | "clear_error" | "toggle_open_inputs";
+			type: "toggle_show_token" | "clear_error" | "toggle_open_inputs";
 	  }
 	| {
 			type: "set_error";
@@ -141,7 +140,7 @@ const reducer = (state: State, action: Action): State => {
 	}
 };
 
-const Landing: FC = () => {
+const Landing = () => {
 	const [state, dispatch] = useReducer(reducer, {
 		id: getId(),
 		showToken: false,
@@ -158,54 +157,69 @@ const Landing: FC = () => {
 		let mounted = true;
 
 		const timeout = setTimeout(() => {
-			context.subscribe(state.id).then(
-				() => {},
-				(reason) =>
-					mounted && dispatch({ type: "set_error", payload: { field: "id", message: reason.message } }),
-			);
+			void context.subscribe(state.id).catch((reason: unknown) => {
+				if (!mounted) return;
+
+				dispatch({
+					type: "set_error",
+					payload: {
+						field: "id",
+						message: reason instanceof Error ? reason.message : "Unknown error",
+					},
+				});
+			});
 		}, 200);
 
 		return () => {
 			mounted = false;
 			clearTimeout(timeout);
 		};
-	}, [state.id]);
+	}, [state.id, context.subscribe]);
 
 	return (
 		<AnimatePresence initial={false}>
-			<DataButton onClick={() => dispatch({ type: "toggle_open_inputs" })} key="bruh">
+			<DataButton
+				onClick={() => dispatch({ type: "toggle_open_inputs" })}
+				key="bruh"
+			>
 				{state.showInputs ? "Hide Inputs" : "Show Inputs"}
 			</DataButton>
 			{state.showInputs && (
-				<AniamtedWrapper
+				<AnimatedWrapper
 					variants={WrapperVariants}
 					initial="collapsed"
 					animate="initial"
 					exit="collapsed"
 					key="data-inputs"
 				>
-					<form action="" onSubmit={(e) => e.preventDefault()}>
+					<form onSubmit={(event) => event.preventDefault()}>
 						<InputGroup>
-							<InputTitle htmlFor="discord-id">Discord Id:</InputTitle>
+							<InputTitle htmlFor="discord-id">Discord ID:</InputTitle>
 							<DataInput
 								id="discord-id"
 								name="discord-id"
-								autoComplete="discord-id"
+								autoComplete="off"
+								spellCheck={false}
 								type="text"
 								value={state.id}
-								onChange={(e) => dispatch({ type: "set_id", payload: e.target.value })}
+								onChange={(e) =>
+									dispatch({ type: "set_id", payload: e.target.value })
+								}
 							/>
 							{state.error && state.error.field === "id" && (
 								<ErrorText>Error: {state.error.message}</ErrorText>
 							)}
 						</InputGroup>
 						<InputGroup>
-							<InputTitle htmlFor="lanyard-token">Lanyard api token:</InputTitle>
+							<InputTitle htmlFor="lanyard-token">
+								Lanyard API token:
+							</InputTitle>
 							<DataInput
 								id="lanyard-token"
 								name="lanyard-token"
 								type={state.showToken ? "text" : "password"}
-								autoComplete="lanyard-token"
+								autoComplete="off"
+								spellCheck={false}
 								value={context.token ?? ""}
 								onChange={(e) => context.setToken(e.target.value)}
 							/>
@@ -236,7 +250,7 @@ const Landing: FC = () => {
 							</CheckboxSpan>
 						</InputGroup>
 					</form>
-				</AniamtedWrapper>
+				</AnimatedWrapper>
 			)}
 		</AnimatePresence>
 	);

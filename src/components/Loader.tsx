@@ -1,4 +1,4 @@
-import { FC } from "react";
+import type { FC } from "react";
 import styled, { keyframes } from "styled-components";
 import Center from "./Center";
 import Fade from "./Fade";

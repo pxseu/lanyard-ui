@@ -1,9 +1,9 @@
+import type { Activity as ActivityType } from "lanyard";
+import { memo } from "react";
+import styled from "styled-components";
 import { Anchor, Wrapper } from "@/components/Common";
 import { useFetchCached } from "@/hooks/fetchCached";
 import { useTime } from "@/hooks/useTime";
-import { Activity as ActivityType } from "lanyard";
-import { FC, memo } from "react";
-import styled from "styled-components";
 import { stringFromType } from "@/utils/activity";
 import { resolveActivity } from "@/utils/asset";
 import Progress from "./Progress";
@@ -39,7 +39,7 @@ const ActivityWrapper = styled(Wrapper)`
 	}
 `;
 
-const Collumn = styled.div<{ flex?: boolean }>`
+const Column = styled.div<{ flex?: boolean }>`
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
@@ -84,7 +84,7 @@ const AssetSmaller = styled(Asset)`
 	right: -5px;
 	width: 40px;
 	height: 40px;
-	background-color: ${({ theme }) => theme.colors.presance};
+	background-color: ${({ theme }) => theme.colors.surface};
 	padding: 3px;
 	border-radius: 50%;
 `;
@@ -112,7 +112,7 @@ interface ActivityProps {
 	focused: boolean;
 }
 
-const Activity: FC<ActivityProps> = ({ activity, focused }) => {
+const Activity = ({ activity, focused }: ActivityProps) => {
 	const isEmoji = activity.type === 4 && !!activity.emoji;
 	const asset = useFetchCached(resolveActivity(activity, "large"));
 	const assetSmaller = useFetchCached(resolveActivity(activity, "small"));
@@ -120,21 +120,36 @@ const Activity: FC<ActivityProps> = ({ activity, focused }) => {
 
 	return (
 		<ActivityWrapper tabIndex={focused ? 0 : undefined}>
-			<Collumn>
-				<AssetWrapper title={activity.type === 4 && !!activity.emoji ? activity.emoji.name : activity.name}>
-					<Asset emoji={isEmoji} show={!!asset} src={asset} alt="Activity asset" />
+			<Column>
+				<AssetWrapper
+					title={
+						activity.type === 4 && !!activity.emoji
+							? activity.emoji.name
+							: activity.name
+					}
+				>
+					<Asset
+						emoji={isEmoji}
+						show={!!asset}
+						src={asset}
+						alt="Activity asset"
+					/>
 
-					{activity.assets?.small_image && (
-						<AssetSmaller show={!!assetSmaller} src={assetSmaller} alt="Smaller activity asset" />
-					)}
+					{activity.assets?.small_image ? (
+						<AssetSmaller
+							show={!!assetSmaller}
+							src={assetSmaller}
+							alt="Smaller activity asset"
+						/>
+					) : null}
 				</AssetWrapper>
-			</Collumn>
-			<Collumn flex>
+			</Column>
+			<Column flex>
 				<ActivityName>
 					{stringFromType(activity.type)} {activity.name}
 				</ActivityName>
-				{activity.details &&
-					(activity.type === 2 && activity.sync_id ? (
+				{activity.details ? (
+					activity.type === 2 && activity.sync_id ? (
 						<Anchor
 							href={`https://open.spotify.com/track/${activity.sync_id}`}
 							target="_blank"
@@ -149,24 +164,39 @@ const Activity: FC<ActivityProps> = ({ activity, focused }) => {
 							</ActivityDetails>
 						</Anchor>
 					) : (
-						<ActivityDetails title={activity.details}>{activity.details}</ActivityDetails>
-					))}
+						<ActivityDetails title={activity.details}>
+							{activity.details}
+						</ActivityDetails>
+					)
+				) : null}
 
-				{activity.state && (
-					<ActivityDetails title={activity.type === 2 ? activity.state.split(";").join() : activity.state}>
-						{activity.type === 2 ? `by: ${activity.state.split(";").join()}` : activity.state}
+				{activity.state ? (
+					<ActivityDetails
+						title={
+							activity.type === 2
+								? activity.state.split(";").join()
+								: activity.state
+						}
+					>
+						{activity.type === 2
+							? `by: ${activity.state.split(";").join()}`
+							: activity.state}
 					</ActivityDetails>
-				)}
-				{activity.type === 2 && activity.assets.large_text && (
+				) : null}
+				{activity.type === 2 && activity.assets.large_text ? (
 					<ActivityDetails title={`${activity.assets.large_text}`}>
 						on: {activity.assets.large_text}
 					</ActivityDetails>
-				)}
-				{time && time.start && !time.end && (
-					<ActivityDetails title={time.start}>{time.start} elapsed</ActivityDetails>
-				)}
-				{time && time.end && !time.start && <ActivityDetails title={time.end}>{time.end} left</ActivityDetails>}
-			</Collumn>
+				) : null}
+				{time?.start && !time.end ? (
+					<ActivityDetails title={time.start}>
+						{time.start} elapsed
+					</ActivityDetails>
+				) : null}
+				{time?.end && !time.start ? (
+					<ActivityDetails title={time.end}>{time.end} left</ActivityDetails>
+				) : null}
+			</Column>
 
 			<Progress time={time} activity={activity.type} />
 		</ActivityWrapper>

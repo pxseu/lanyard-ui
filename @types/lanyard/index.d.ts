@@ -2,7 +2,7 @@
 /* eslint-disable */
 
 declare module "lanyard" {
-	export type SocketMessageRecieve =
+	export type SocketMessageReceive =
 		| {
 				op: 1;
 				d: { heartbeat_interval: number };
@@ -34,7 +34,7 @@ declare module "lanyard" {
 		  };
 
 	export interface Presence {
-		spotify: any;
+		spotify: Record<string, unknown> | null;
 		listening_to_spotify: boolean;
 		kv: Record<string, string>;
 		discord_user: DiscordUser;
@@ -72,7 +72,6 @@ declare module "lanyard" {
 			asset: string;
 			sku_id: string;
 		} | null;
-		public_flags: number;
 		clan: Clan;
 		primary_guild: Clan;
 		collectibles: Record<string, Collectible>;

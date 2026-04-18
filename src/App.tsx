@@ -1,22 +1,20 @@
+import { createContext, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
+import styled from "styled-components";
+import Credits from "@/components/Credits";
+import Inputs from "@/components/Data";
+import Activities from "@/components/Lanyard/ActivitiesWrapper";
+import KV from "@/components/Lanyard/KV";
+import User from "@/components/Lanyard/User";
+import LastSeen from "@/components/LastSeen";
 import Loader from "@/components/Loader";
 import { useLanyard } from "@/hooks/useLanyard";
-import Inputs from "@/components/Data";
-import { createContext, FC, useEffect } from "react";
-import User from "@/components/Lanyard/User";
-import styled from "styled-components";
-import KV from "@/components/Lanyard/KV";
-import { logger } from "@/utils/log";
 import { PRODUCTION } from "@/utils/consts";
-import { Helmet, HelmetProvider } from "react-helmet-async";
-import Credits from "@/components/Credits";
-import Activities from "@/components/Lanyard/ActivitiesWrapper";
-import LastSeen from "@/components/LastSeen";
+import { logger } from "@/utils/log";
 
-export const AppContext = createContext<ReturnType<typeof useLanyard> | null>(
-	null,
-);
+export const AppContext = createContext<ReturnType<typeof useLanyard> | null>(null);
 
-const Postition = styled.div`
+const Position = styled.div`
 	padding-top: 30px;
 	display: flex;
 	flex-direction: column;
@@ -28,42 +26,35 @@ const Postition = styled.div`
 
 const log = logger("info", "App");
 
-const App: FC = () => {
+const App = () => {
 	const lanyard = useLanyard();
+	const presence = lanyard.presence;
 
 	useEffect(() => {
 		log("MODE", import.meta.env.MODE);
 		log("PRODUCTION", PRODUCTION);
 	}, []);
 
-	if (lanyard.connecting || !lanyard.presance) return <Loader />;
+	if (lanyard.connecting || !presence) return <Loader />;
 
 	return (
-		<HelmetProvider>
-			<AppContext.Provider value={lanyard}>
-				<Helmet>
-					{lanyard.presance ? (
-						<title>
-							{`Checking User: ${lanyard.presance.discord_user.username}${
-								lanyard.presance.discord_user.discriminator !== "0"
-									? `#${lanyard.presance.discord_user.discriminator}`
-									: ""
-							}`}
-						</title>
-					) : (
-						<title>Lanyard UI</title>
-					)}
-				</Helmet>
-				<Postition>
-					<Inputs />
-					<User />
-					<LastSeen />
-					<Activities />
-					<KV />
-					<Credits />
-				</Postition>
-			</AppContext.Provider>
-		</HelmetProvider>
+		<AppContext.Provider value={lanyard}>
+			<Helmet>
+				<title>
+					{`Checking User: ${presence.discord_user.username}${
+						presence.discord_user.discriminator !== "0" ? `#${presence.discord_user.discriminator}` : ""
+					}`}
+				</title>
+			</Helmet>
+			<Position>
+				<Inputs />
+				<User />
+				<LastSeen />
+				<Activities />
+				<KV />
+				<Credits />
+			</Position>
+		</AppContext.Provider>
 	);
 };
 

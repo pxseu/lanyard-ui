@@ -11,13 +11,14 @@ const Code = styled.code``;
 
 const LastSeen = () => {
 	const state = useAppContext();
+	const presence = state.presence;
 
 	const time = useTime({
-		start: state.presance?.last_seen,
+		start: presence?.last_seen,
 	});
 
 	// not implemented yet
-	if (state.presance?.discord_status !== "offline" || !state.presance?.last_seen) return null;
+	if (presence?.discord_status !== "offline" || !presence.last_seen) return null;
 
 	return (
 		<Wrapper>

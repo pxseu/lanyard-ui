@@ -1,4 +1,4 @@
-import { Timestamps } from "lanyard";
+import type { Timestamps } from "lanyard";
 import { useEffect, useState } from "react";
 
 const padding = (n: number) => (n < 10 ? `0${n}` : n);
@@ -41,7 +41,12 @@ const getTime = (timestamps?: Timestamps): Times | null => {
 	const seconds = Math.floor((miliseconds % MINUTE) / SECOND);
 
 	if (!end) {
-		if (days > 0) return { start: `${days > 1 ? `${days} days` : `${days} day`}`, end: null, completion: null };
+		if (days > 0)
+			return {
+				start: `${days > 1 ? `${days} days` : `${days} day`}`,
+				end: null,
+				completion: null,
+			};
 
 		return {
 			start: `${hours ? `${hours}:` : ""}${padding(minutes)}:${padding(seconds)}`,
