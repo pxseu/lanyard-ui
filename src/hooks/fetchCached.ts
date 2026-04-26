@@ -1,15 +1,9 @@
 import { useEffect, useState } from "react";
-import {
-	ADD_MEDIA_URL,
-	DEFAULT_AVATAR_PATH,
-	PLACEHOLDER_PRESENCE,
-} from "@/utils/consts";
+import { ADD_MEDIA_URL, DEFAULT_AVATAR_PATH, PLACEHOLDER_PRESENCE } from "@/utils/consts";
 
 const fetchUrl = async (url: string, signal: AbortSignal) => {
 	const response = await fetch(url, { signal });
-	const blob = await (response.ok
-		? response.blob()
-		: Promise.reject(new Error("Network response was not ok.")));
+	const blob = await (response.ok ? response.blob() : Promise.reject(new Error("Network response was not ok.")));
 	return URL.createObjectURL(blob);
 };
 
@@ -30,9 +24,7 @@ export const useFetchCached = (url: string | null): string | undefined => {
 			return;
 		}
 
-		if (
-			url.startsWith(`${ADD_MEDIA_URL}/${PLACEHOLDER_PRESENCE.discord_user.id}`)
-		) {
+		if (url.startsWith(`${ADD_MEDIA_URL}/${PLACEHOLDER_PRESENCE.discord_user.id}`)) {
 			setOldUrl(url);
 			setData(undefined);
 			return;

@@ -39,9 +39,7 @@ const ClanName = styled.p`
 `;
 
 const Clan: FC<{ clan: NonNullable<DiscordUser["clan"]> }> = ({ clan }) => {
-	const image = useFetchCached(
-		`https://cdn.discordapp.com/clan-badges/${clan.identity_guild_id}/${clan.badge}.png`,
-	);
+	const image = useFetchCached(`https://cdn.discordapp.com/clan-badges/${clan.identity_guild_id}/${clan.badge}.png`);
 
 	return (
 		<Wrapper>

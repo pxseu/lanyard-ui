@@ -42,13 +42,7 @@ const ProgressTime = styled.p`
 	font-weight: normal;
 `;
 
-const Progress = ({
-	time,
-	activity,
-}: {
-	time: ReturnType<typeof useTime>;
-	activity: number;
-}) => {
+const Progress = ({ time, activity }: { time: ReturnType<typeof useTime>; activity: number }) => {
 	if (!time?.completion) return null;
 
 	const progressStyle = {

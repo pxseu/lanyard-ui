@@ -39,8 +39,7 @@ const Activities = () => {
 
 	if (!presence) return null;
 
-	const activities: ActivityType[] =
-		presence.activities.length > 0 ? presence.activities : [DEFAULT_ACTIVITY];
+	const activities: ActivityType[] = presence.activities.length > 0 ? presence.activities : [DEFAULT_ACTIVITY];
 
 	return (
 		<ActivityWrapper>

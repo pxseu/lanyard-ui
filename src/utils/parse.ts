@@ -5,10 +5,7 @@ import { logger } from "./log";
 const log = logger("log", "parse", true);
 
 export const parse = <T>(data: ArrayBuffer | string): T => {
-	const decompressed =
-		typeof data === "string"
-			? data
-			: pako.inflate(new Uint8Array(data), { to: "string" });
+	const decompressed = typeof data === "string" ? data : pako.inflate(new Uint8Array(data), { to: "string" });
 
 	return JSON.parse(decompressed, (key, value) => {
 		if (!PRODUCTION) log(key, value, typeof value);

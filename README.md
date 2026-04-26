@@ -56,13 +56,13 @@ $ bun run preview
 
 ## Features
 
--   🚀 Built with Vite for lightning-fast development
--   ⚛️ React 18 with modern hooks and patterns
--   🎨 Styled Components for beautiful, maintainable styling
--   🔄 Real-time Discord presence updates
--   🔑 KV store editor with validation
--   🎭 Support for Discord decorations and custom statuses
--   📱 Responsive design
+- 🚀 Built with Vite for lightning-fast development
+- ⚛️ React 18 with modern hooks and patterns
+- 🎨 Styled Components for beautiful, maintainable styling
+- 🔄 Real-time Discord presence updates
+- 🔑 KV store editor with validation
+- 🎭 Support for Discord decorations and custom statuses
+- 📱 Responsive design
 
 ## Contributing
 

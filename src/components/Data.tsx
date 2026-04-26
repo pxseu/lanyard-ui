@@ -178,10 +178,7 @@ const Landing = () => {
 
 	return (
 		<AnimatePresence initial={false}>
-			<DataButton
-				onClick={() => dispatch({ type: "toggle_open_inputs" })}
-				key="bruh"
-			>
+			<DataButton onClick={() => dispatch({ type: "toggle_open_inputs" })} key="bruh">
 				{state.showInputs ? "Hide Inputs" : "Show Inputs"}
 			</DataButton>
 			{state.showInputs && (
@@ -202,18 +199,14 @@ const Landing = () => {
 								spellCheck={false}
 								type="text"
 								value={state.id}
-								onChange={(e) =>
-									dispatch({ type: "set_id", payload: e.target.value })
-								}
+								onChange={(e) => dispatch({ type: "set_id", payload: e.target.value })}
 							/>
 							{state.error && state.error.field === "id" && (
 								<ErrorText>Error: {state.error.message}</ErrorText>
 							)}
 						</InputGroup>
 						<InputGroup>
-							<InputTitle htmlFor="lanyard-token">
-								Lanyard API token:
-							</InputTitle>
+							<InputTitle htmlFor="lanyard-token">Lanyard API token:</InputTitle>
 							<DataInput
 								id="lanyard-token"
 								name="lanyard-token"

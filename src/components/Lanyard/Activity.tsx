@@ -19,7 +19,8 @@ const ActivityWrapper = styled(Wrapper)`
 
 	--border-width: 2px;
 	border-radius: 0;
-	box-shadow: var(--border-width) 0px 0px 0px ${({ theme }) => theme.colors.outline},
+	box-shadow:
+		var(--border-width) 0px 0px 0px ${({ theme }) => theme.colors.outline},
 		calc(-1 * var(--border-width)) 0px 0px 0px ${({ theme }) => theme.colors.outline};
 
 	--gap: 20px;
@@ -121,26 +122,11 @@ const Activity = ({ activity, focused }: ActivityProps) => {
 	return (
 		<ActivityWrapper tabIndex={focused ? 0 : undefined}>
 			<Column>
-				<AssetWrapper
-					title={
-						activity.type === 4 && !!activity.emoji
-							? activity.emoji.name
-							: activity.name
-					}
-				>
-					<Asset
-						emoji={isEmoji}
-						show={!!asset}
-						src={asset}
-						alt="Activity asset"
-					/>
+				<AssetWrapper title={activity.type === 4 && !!activity.emoji ? activity.emoji.name : activity.name}>
+					<Asset emoji={isEmoji} show={!!asset} src={asset} alt="Activity asset" />
 
 					{activity.assets?.small_image ? (
-						<AssetSmaller
-							show={!!assetSmaller}
-							src={assetSmaller}
-							alt="Smaller activity asset"
-						/>
+						<AssetSmaller show={!!assetSmaller} src={assetSmaller} alt="Smaller activity asset" />
 					) : null}
 				</AssetWrapper>
 			</Column>
@@ -164,23 +150,13 @@ const Activity = ({ activity, focused }: ActivityProps) => {
 							</ActivityDetails>
 						</Anchor>
 					) : (
-						<ActivityDetails title={activity.details}>
-							{activity.details}
-						</ActivityDetails>
+						<ActivityDetails title={activity.details}>{activity.details}</ActivityDetails>
 					)
 				) : null}
 
 				{activity.state ? (
-					<ActivityDetails
-						title={
-							activity.type === 2
-								? activity.state.split(";").join()
-								: activity.state
-						}
-					>
-						{activity.type === 2
-							? `by: ${activity.state.split(";").join()}`
-							: activity.state}
+					<ActivityDetails title={activity.type === 2 ? activity.state.split(";").join() : activity.state}>
+						{activity.type === 2 ? `by: ${activity.state.split(";").join()}` : activity.state}
 					</ActivityDetails>
 				) : null}
 				{activity.type === 2 && activity.assets.large_text ? (
@@ -189,13 +165,9 @@ const Activity = ({ activity, focused }: ActivityProps) => {
 					</ActivityDetails>
 				) : null}
 				{time?.start && !time.end ? (
-					<ActivityDetails title={time.start}>
-						{time.start} elapsed
-					</ActivityDetails>
+					<ActivityDetails title={time.start}>{time.start} elapsed</ActivityDetails>
 				) : null}
-				{time?.end && !time.start ? (
-					<ActivityDetails title={time.end}>{time.end} left</ActivityDetails>
-				) : null}
+				{time?.end && !time.start ? <ActivityDetails title={time.end}>{time.end} left</ActivityDetails> : null}
 			</Column>
 
 			<Progress time={time} activity={activity.type} />

@@ -2,13 +2,7 @@ import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { memo, useEffect, useReducer, useRef } from "react";
 import { FaRegCheckCircle, FaTrash, FaUndo } from "react-icons/fa";
 import styled from "styled-components";
-import {
-	ElementWrapper,
-	ErrorText,
-	Input,
-	MotionButton,
-	TextArea,
-} from "@/components/Common";
+import { ElementWrapper, ErrorText, Input, MotionButton, TextArea } from "@/components/Common";
 import { useAppContext } from "@/hooks/useContexts";
 
 const KVInputWrapper = styled.span`
@@ -25,7 +19,9 @@ const KVButton = styled(MotionButton)<{ show?: boolean; hovercolors?: string }>`
 	width: 45px;
 	margin-left: 8px;
 	padding: 8px;
-	transition: color 0.1s ease-in-out, outline 0.05s ease-in-out;
+	transition:
+		color 0.1s ease-in-out,
+		outline 0.05s ease-in-out;
 
 	&:focus {
 		${({ hovercolors: hoverColors }) => hoverColors && `color: ${hoverColors};`}
@@ -115,14 +111,9 @@ const buttonVariants: Variants = {
 const isInitialToState = (state: State, action: Action): boolean => {
 	switch (action.type) {
 		case "set_key":
-			return (
-				state.initialKey === action.payload &&
-				state.initialValue === state.value
-			);
+			return state.initialKey === action.payload && state.initialValue === state.value;
 		case "set_value":
-			return (
-				state.initialValue === action.payload && state.initialKey === state.key
-			);
+			return state.initialValue === action.payload && state.initialKey === state.key;
 		default:
 			return false;
 	}
@@ -301,8 +292,7 @@ const KVElement = ({ data, ...props }: KVElementProps) => {
 
 		async function makeRequest() {
 			// if there is a initial key and action is delete we send a delete request
-			if (state.delete && state.initialKey)
-				return kvApi("DELETE", `/${encodeURIComponent(state.initialKey)}`);
+			if (state.delete && state.initialKey) return kvApi("DELETE", `/${encodeURIComponent(state.initialKey)}`);
 
 			if (state.initialKey && state.key !== state.initialKey)
 				return Promise.all([
@@ -323,14 +313,7 @@ const KVElement = ({ data, ...props }: KVElementProps) => {
 		return () => {
 			mounted = false;
 		};
-	}, [
-		kvApi,
-		state.delete,
-		state.initialKey,
-		state.key,
-		state.sending,
-		state.value,
-	]);
+	}, [kvApi, state.delete, state.initialKey, state.key, state.sending, state.value]);
 
 	useEffect(() => {
 		let mounted = true;
@@ -367,8 +350,7 @@ const KVElement = ({ data, ...props }: KVElementProps) => {
 			kvValidate(state.key, state.value);
 			if (mounted) dispatch({ type: "error", payload: null });
 		} catch (e) {
-			if (mounted && e instanceof Error)
-				dispatch({ type: "error", payload: e.message });
+			if (mounted && e instanceof Error) dispatch({ type: "error", payload: e.message });
 		}
 
 		return () => {
@@ -376,10 +358,7 @@ const KVElement = ({ data, ...props }: KVElementProps) => {
 		};
 	}, [state.key, state.value, kvValidate]);
 
-	const onKeyDown = (
-		event: React.KeyboardEvent<HTMLElement>,
-		cb?: () => void,
-	) => {
+	const onKeyDown = (event: React.KeyboardEvent<HTMLElement>, cb?: () => void) => {
 		if (event.key === "Enter" && !event.shiftKey) {
 			cb?.();
 		}
@@ -400,9 +379,7 @@ const KVElement = ({ data, ...props }: KVElementProps) => {
 				<KVInputWrapper>
 					<Input
 						value={state.key}
-						onChange={(e) =>
-							dispatch({ type: "set_key", payload: e.target.value })
-						}
+						onChange={(e) => dispatch({ type: "set_key", payload: e.target.value })}
 						placeholder="key"
 						required={state.editing}
 						disabled={state.sending}
@@ -411,14 +388,10 @@ const KVElement = ({ data, ...props }: KVElementProps) => {
 					<CenterColumn>
 						<AnimatePresence>
 							{/* delete button */}
-							{(state.editing || state.hover) &&
-							!!state.initialKey &&
-							!!state.initialValue ? (
+							{(state.editing || state.hover) && !!state.initialKey && !!state.initialValue ? (
 								<KVButton
 									onClick={deleteValue}
-									onKeyDown={(e: React.KeyboardEvent<HTMLElement>) =>
-										onKeyDown(e, deleteValue)
-									}
+									onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => onKeyDown(e, deleteValue)}
 									hovercolors="#a53434"
 									transition={{ duration: 0.2 }}
 									variants={buttonVariants}
@@ -437,15 +410,11 @@ const KVElement = ({ data, ...props }: KVElementProps) => {
 				<KVInputWrapper>
 					<TextArea
 						value={state.value}
-						onChange={(e) =>
-							dispatch({ type: "set_value", payload: e.target.value })
-						}
+						onChange={(e) => dispatch({ type: "set_value", payload: e.target.value })}
 						placeholder="value"
 						required={state.editing}
 						disabled={state.sending}
-						onKeyDown={(e: React.KeyboardEvent<HTMLElement>) =>
-							onKeyDown(e, editingDone)
-						}
+						onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => onKeyDown(e, editingDone)}
 					/>
 					<CenterColumn>
 						<AnimatePresence>
@@ -453,9 +422,7 @@ const KVElement = ({ data, ...props }: KVElementProps) => {
 							{state.editing ? (
 								<KVButton
 									onClick={reset}
-									onKeyDown={(e: React.KeyboardEvent<HTMLElement>) =>
-										onKeyDown(e, reset)
-									}
+									onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => onKeyDown(e, reset)}
 									hovercolors="#a59d34"
 									transition={{ duration: 0.2 }}
 									variants={buttonVariants}
@@ -472,9 +439,7 @@ const KVElement = ({ data, ...props }: KVElementProps) => {
 							{state.editing ? (
 								<KVButton
 									onClick={editingDone}
-									onKeyDown={(e: React.KeyboardEvent<HTMLElement>) =>
-										onKeyDown(e, editingDone)
-									}
+									onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => onKeyDown(e, editingDone)}
 									hovercolors="#34a534"
 									transition={{ duration: 0.2 }}
 									variants={buttonVariants}

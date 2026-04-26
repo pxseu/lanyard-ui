@@ -119,7 +119,10 @@ export const Button = styled.button`
 	color: ${({ theme }) => theme.colors.primary};
 	font-size: 1em;
 	cursor: pointer;
-	transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, outline 0.05s ease-in-out;
+	transition:
+		background-color 0.2s ease-in-out,
+		box-shadow 0.2s ease-in-out,
+		outline 0.05s ease-in-out;
 
 	&:hover,
 	&:focus {
@@ -142,7 +145,10 @@ export const MotionButton = styled(motion.button)`
 	color: ${({ theme }) => theme.colors.primary};
 	font-size: 1em;
 	cursor: pointer;
-	transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, outline 0.05s ease-in-out;
+	transition:
+		background-color 0.2s ease-in-out,
+		box-shadow 0.2s ease-in-out,
+		outline 0.05s ease-in-out;
 
 	&:hover,
 	&:focus {

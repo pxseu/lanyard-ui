@@ -1,8 +1,4 @@
-import type {
-	Presence,
-	SocketMessageReceive,
-	SocketMessageSend,
-} from "lanyard";
+import type { Presence, SocketMessageReceive, SocketMessageSend } from "lanyard";
 import { useEffect, useReducer, useRef } from "react";
 import {
 	KEY_ID,
@@ -105,11 +101,7 @@ const reducer = (state: State, action: Action): State => {
 			lanyardLog("Presence received", action.payload);
 
 			if (Object.keys(action.payload).length === 0) return state;
-			if (
-				state.subscribed &&
-				state.subscribed !== action.payload.discord_user.id
-			)
-				return state;
+			if (state.subscribed && state.subscribed !== action.payload.discord_user.id) return state;
 
 			localStorage.setItem(PRESENCE_KEY, JSON.stringify(action.payload));
 
@@ -208,12 +200,7 @@ export const useLanyard = () => {
 
 	const subscribe = async (user: string, resubscribe = false) => {
 		if (!USER_REGEX.test(user)) throw new Error(Errors.notFound);
-		if (
-			!resubscribe &&
-			state.subscribed === user &&
-			socket.current?.readyState === WebSocket.OPEN
-		)
-			return;
+		if (!resubscribe && state.subscribed === user && socket.current?.readyState === WebSocket.OPEN) return;
 
 		const response = await fetch(`${LANYARD_BASE_URL}/users/${user}`);
 		if (!response.ok) throw new Error(Errors.notFound);
@@ -251,12 +238,9 @@ export const useLanyard = () => {
 
 	const kvValidate = (key: string, data?: string) => {
 		if (key === "") throw new Error("Key cannot be empty");
-		if (key.length > KEY_MAX_LENGTH)
-			throw new Error(`Key cannot be longer than ${KEY_MAX_LENGTH} characters`);
-		if (!KEY_REGEX.test(key))
-			throw new Error("Key must be an alphanumeric string with underscores");
-		if (data && data.length > VALUE_MAX_LENGTH)
-			throw new Error(`Value cannot be longer than ${VALUE_MAX_LENGTH}`);
+		if (key.length > KEY_MAX_LENGTH) throw new Error(`Key cannot be longer than ${KEY_MAX_LENGTH} characters`);
+		if (!KEY_REGEX.test(key)) throw new Error("Key must be an alphanumeric string with underscores");
+		if (data && data.length > VALUE_MAX_LENGTH) throw new Error(`Value cannot be longer than ${VALUE_MAX_LENGTH}`);
 	};
 
 	const kvApi = async (method: KVMethod, path: string, body?: string) => {
@@ -271,17 +255,14 @@ export const useLanyard = () => {
 			throw new Error("You have reached the maximum amount of keys");
 		}
 
-		const response = await fetch(
-			`${LANYARD_BASE_URL}/users/${state.subscribed}/kv${path}`,
-			{
-				method,
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: state.token,
-				},
-				body,
+		const response = await fetch(`${LANYARD_BASE_URL}/users/${state.subscribed}/kv${path}`, {
+			method,
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: state.token,
 			},
-		);
+			body,
+		});
 
 		if (response.ok) return;
 
@@ -324,10 +305,7 @@ export const useLanyard = () => {
 			clearReconnect();
 
 			const waitTime = delay === 0 ? RECONNECT_INTERVAL : delay;
-			const nextDelay = Math.min(
-				waitTime + RECONNECT_INTERVAL,
-				MAX_RECONNECT_TIME,
-			);
+			const nextDelay = Math.min(waitTime + RECONNECT_INTERVAL, MAX_RECONNECT_TIME);
 
 			reconnect.current = setTimeout(() => {
 				reconnect.current = null;
@@ -375,10 +353,7 @@ export const useLanyard = () => {
 
 				case 1: {
 					clearHeartbeat();
-					heartbeat.current = setInterval(
-						heartbeatSend,
-						data.d.heartbeat_interval,
-					);
+					heartbeat.current = setInterval(heartbeatSend, data.d.heartbeat_interval);
 					break;
 				}
 
