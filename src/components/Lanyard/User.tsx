@@ -110,10 +110,20 @@ const DecorationImage = styled.img`
 const User = () => {
 	const state = useAppContext();
 	const { presence } = state;
-	const avatar = useFetchCached(presence ? resolveAvatar(presence.discord_user) : null);
-	const banner = useFetchCached(presence ? `${ADD_MEDIA_URL}/banners/${presence.discord_user.id}?size=512` : null);
-	const decorationHover = useFetchCached(presence ? resolveDecoration(true, presence.discord_user) : null);
-	const decoration = useFetchCached(presence ? resolveDecoration(false, presence.discord_user) : null);
+	const avatar = useFetchCached(
+		presence ? resolveAvatar(presence.discord_user) : null,
+	);
+	const banner = useFetchCached(
+		presence
+			? `${ADD_MEDIA_URL}/banners/${presence.discord_user.id}?size=512`
+			: null,
+	);
+	const decorationHover = useFetchCached(
+		presence ? resolveDecoration(true, presence.discord_user) : null,
+	);
+	const decoration = useFetchCached(
+		presence ? resolveDecoration(false, presence.discord_user) : null,
+	);
 
 	if (!presence) return null;
 
@@ -123,24 +133,28 @@ const User = () => {
 			<AvatarWrapper title={presence.discord_status} isBanner={!!banner}>
 				<Avatar show={!!avatar} src={avatar} alt="User avatar" />
 				<Status color={presence.discord_status} />
-				{presence.discord_user.avatar_decoration_data && decoration && decorationHover && (
-					<DecorationImage
-						src={decoration}
-						alt="User decoration"
-						onMouseEnter={(e) => {
-							e.currentTarget.src = decorationHover;
-						}}
-						onMouseLeave={(e) => {
-							e.currentTarget.src = decoration;
-						}}
-					/>
-				)}
+				{presence.discord_user.avatar_decoration_data &&
+					decoration &&
+					decorationHover && (
+						<DecorationImage
+							src={decoration}
+							alt="User decoration"
+							onMouseEnter={(e) => {
+								e.currentTarget.src = decorationHover;
+							}}
+							onMouseLeave={(e) => {
+								e.currentTarget.src = decoration;
+							}}
+						/>
+					)}
 			</AvatarWrapper>
 			<TextWrapper>
 				{presence.discord_user.discriminator !== "0" ? (
 					<Username>
 						{presence.discord_user.username}
-						<Discriminator>#{presence.discord_user.discriminator}</Discriminator>
+						<Discriminator>
+							#{presence.discord_user.discriminator}
+						</Discriminator>
 					</Username>
 				) : (
 					<>
@@ -149,7 +163,9 @@ const User = () => {
 					</>
 				)}
 				<Badges user={presence.discord_user} />
-				{presence.discord_user.clan ? <Clan clan={presence.discord_user.clan} /> : null}
+				{presence.discord_user.primary_guild ? (
+					<Clan clan={presence.discord_user.primary_guild} />
+				) : null}
 			</TextWrapper>
 		</UserWrapper>
 	);

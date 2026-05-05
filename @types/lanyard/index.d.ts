@@ -72,6 +72,9 @@ declare module "lanyard" {
 			asset: string;
 			sku_id: string;
 		} | null;
+		/**
+		 * @deprecated use primary_guild instead
+		 */
 		clan: Clan;
 		primary_guild: Clan;
 		collectibles: Record<string, Collectible>;
