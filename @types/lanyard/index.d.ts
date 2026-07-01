@@ -46,12 +46,19 @@ declare module "lanyard" {
 		last_seen?: number;
 	}
 
-	export type Clan = {
-		tag: string;
-		badge: string;
-		identity_enabled: boolean;
-		identity_guild_id: string;
-	} | null;
+	export type Clan =
+		| {
+				tag: string;
+				badge: string;
+				identity_enabled: true;
+				identity_guild_id: string;
+		  }
+		| {
+				tag: null;
+				badge: null;
+				identity_enabled: false;
+				identity_guild_id: null;
+		  };
 
 	export interface Collectible {
 		asset: string;
@@ -72,10 +79,6 @@ declare module "lanyard" {
 			asset: string;
 			sku_id: string;
 		} | null;
-		/**
-		 * @deprecated use primary_guild instead
-		 */
-		clan: Clan;
 		primary_guild: Clan;
 		collectibles: Record<string, Collectible>;
 	}

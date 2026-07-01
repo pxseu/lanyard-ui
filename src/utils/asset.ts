@@ -67,12 +67,7 @@ const resolveEmoji = (emoji: Emoji) => {
 		return `${TWEMOJI_CDN}${TWEMOJI_OVERRIDES[codepoints] ?? codepoints}.svg`;
 	}
 
-	// if emoji is not animated use png
-	if (!emoji.animated)
-		return `https://cdn.discordapp.com/emojis/${emoji.id}.png`;
-
-	// if emoji is animated use gif
-	return `https://cdn.discordapp.com/emojis/${emoji.id}.gif`;
+	return `https://cdn.discordapp.com/emojis/${emoji.id}.webp${emoji.animated ? "?animated=true" : ""}`;
 };
 
 export const resolveActivity = (

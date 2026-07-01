@@ -163,7 +163,7 @@ const User = () => {
 					</>
 				)}
 				<Badges user={presence.discord_user} />
-				{presence.discord_user.primary_guild ? (
+				{presence.discord_user.primary_guild.identity_enabled ? (
 					<Clan clan={presence.discord_user.primary_guild} />
 				) : null}
 			</TextWrapper>
