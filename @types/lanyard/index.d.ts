@@ -79,7 +79,7 @@ declare module "lanyard" {
 			asset: string;
 			sku_id: string;
 		} | null;
-		primary_guild: Clan;
+		primary_guild: Clan | null;
 		collectibles: Record<string, Collectible>;
 	}
 
